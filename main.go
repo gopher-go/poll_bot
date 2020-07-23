@@ -9,6 +9,8 @@ import (
 	"github.com/mileusna/viber"
 )
 
+var caseSensitive = true
+
 func main() {
 	err := execute()
 	if err != nil {

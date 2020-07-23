@@ -111,18 +111,32 @@ func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
 	}
 
 	answer := c.Message.Text
-	if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
+	normalAnswer := answer
+	if !caseSensitive {
+		answer = strings.ToLower(answer)
+		found := false
+		for _, v := range item.possibleAnswers {
+			if answer == strings.ToLower(v) {
+				normalAnswer = v
+				found = true
+				break
+			}
+		}
+		if !found {
+			return errors.New("Пожалуйста выберите предложенный ответ.")
+		}
+	} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
 		return errors.New("Пожалуйста выберите предложенный ответ.")
 	}
 
 	if item.validateAnswer != nil {
-		err := item.validateAnswer(answer)
+		err := item.validateAnswer(normalAnswer)
 		if err != nil {
 			return err
 		}
 	}
 	if item.persistAnswer != nil {
-		err := item.persistAnswer(answer, u)
+		err := item.persistAnswer(normalAnswer, u)
 		if err != nil {
 			return err
 		}
