@@ -121,22 +121,22 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Вы уже проголосовали за Александр Лукашенко")
+	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Укажите, пожалуйста, Ваш пол")
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Вы уже проголосовали за Александр Лукашенко")
+	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Укажите, пожалуйста, Ваш пол")
 
 	subscribe := newSubscribeCallback(t, userId)
 	user, err = s.Obtain(userId)
 	require.NoError(t, err)
 	reply, err = generateReplyFor(p, s, subscribe)
 	require.NoError(t, err)
-	require.Equal(t, reply, "")
+	require.Empty(t, reply)
 
 	reply, err = generateReplyFor(p, s, newSeenCallback(t, userId))
 	require.NoError(t, err)
-	require.Equal(t, reply, "")
+	require.Empty(t, reply)
 }
 
 func newSubscribeCallback(t *testing.T, id string) *ViberCallback {
