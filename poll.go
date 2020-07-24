@@ -45,10 +45,9 @@ func generateOurPoll() poll {
 			"1. Да",
 			"2. Нет",
 		},
-		validateAnswer: func(answer string) error {
-			if answer != "1. Да" {
-				return errors.New("Только граждание Беларуси могут принимать участие!")
-			}
+		persistAnswer: func(answer string, u *storageUser) error {
+			u.Properties["isBelurussia"] = answer
+			u.isChanged = true
 			return nil
 		},
 	})
