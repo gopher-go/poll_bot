@@ -80,7 +80,7 @@ func handleMain(p poll, v *viber.Viber, s *Storage, w http.ResponseWriter, r *ht
 		}
 		_, err = v.SendMessage(c.User.Id, message)
 		if err != nil {
-			log.Printf("Error sending message %v", err)
+			log.Printf("Error sending message %v to user id %s", err, c.User.Id)
 			http.Error(w, "can't reply", http.StatusBadRequest)
 			return
 		}
