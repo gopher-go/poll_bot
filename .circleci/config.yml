@@ -29,8 +29,10 @@ jobs:
       - run:
           name: Deploying app
           command: |
-            if [[ $CIRCLE_BRANCH == fake_branch ]] ; then
+            if [[ $CIRCLE_BRANCH == production ]] ; then
               BUILD_NUM=<< pipeline.number >>
+              echo "Create .env file"
+              sh ./deploy/create_env_file.sh
               echo "Deploying app"
               sudo apt-get install google-cloud-sdk-app-engine-go
               gcloud app deploy --project $GOOGLE_PROJECT_ID -q
