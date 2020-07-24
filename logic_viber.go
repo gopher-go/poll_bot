@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите предложенный ответ.")
+	errPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите предложенный ответ.")
 )
 
 func knownEvent(c *ViberCallback) bool {
@@ -35,17 +35,17 @@ type viberReply struct {
 	options []string
 }
 
-func generateReplyFor(poll poll, storage *Storage, callback *ViberCallback) (*viberReply, error) {
+func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*viberReply, error) {
 	if !knownEvent(callback) {
 		return nil, fmt.Errorf("Unknown message %v", callback.Event)
 	}
 
 	if strings.ToLower(callback.Message.Text) == "clear" {
-		err := storage.Clear(callback.User.Id)
+		err := storage.Clear(callback.User.ID)
 		return &viberReply{text: fmt.Sprintf("Your storage cleared with %v", err)}, nil
 	}
 
-	storageUser, err := storage.Obtain(callback.User.Id)
+	storageUser, err := storage.Obtain(callback.User.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func generateReplyFor(poll poll, storage *Storage, callback *ViberCallback) (*vi
 	return nil, nil
 }
 
-func getViberReplyForLevel(p poll, s *Storage, u *StorageUser, c *ViberCallback) (*viberReply, error) {
+func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback) (*viberReply, error) {
 	var welcome string
 	if u.Properties["ConversationStarted"] != "true" {
 		if c.User.Name == "" {
@@ -125,7 +125,7 @@ func getViberReplyForLevel(p poll, s *Storage, u *StorageUser, c *ViberCallback)
 	return &reply, nil
 }
 
-func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
+func analyseAnswer(p poll, u *storageUser, c *ViberCallback) error {
 	item := p.getLevel(u.Level)
 	if item == nil {
 		return nil
@@ -138,7 +138,7 @@ func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
 	// handle numeric reply
 	if n, err := strconv.Atoi(answer); err == nil {
 		if n > len(item.possibleAnswers) || n < 1 {
-			return ErrPleaseChooseSuggestedAnswer
+			return errPleaseChooseSuggestedAnswer
 		}
 		normalAnswer = item.possibleAnswers[n-1]
 		found = true
@@ -158,10 +158,10 @@ func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
 			}
 
 			if !found {
-				return ErrPleaseChooseSuggestedAnswer
+				return errPleaseChooseSuggestedAnswer
 			}
 		} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
-			return ErrPleaseChooseSuggestedAnswer
+			return errPleaseChooseSuggestedAnswer
 		}
 	}
 

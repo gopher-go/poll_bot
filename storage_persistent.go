@@ -14,7 +14,7 @@ type persistenseStorage struct {
 	db *sql.DB
 }
 
-const initDbSql = `CREATE TABLE users (
+const initDbSQL = `CREATE TABLE users (
 	id TEXT PRIMARY KEY,
 	country VARCHAR(10) NOT NULL,
 	level INT NOT NULL,
@@ -29,7 +29,7 @@ func newPersistenseStorageSqllite() (*persistenseStorage, error) {
 		return nil, err
 	}
 
-	batch := []string{initDbSql}
+	batch := []string{initDbSQL}
 
 	for _, b := range batch {
 		_, _ = db.Exec(b)
@@ -57,12 +57,12 @@ func newPersistenseStoragePq() (*persistenseStorage, error) {
 	}, nil
 }
 
-func (s *persistenseStorage) load(id string) (*StorageUser, error) {
+func (s *persistenseStorage) load(id string) (*storageUser, error) {
 	sqlStatement := `SELECT id, country, context, level, properties, candidate FROM users WHERE id = $1;`
-	var user StorageUser
+	var user storageUser
 	row := s.db.QueryRow(sqlStatement, id)
 	var properties string
-	err := row.Scan(&user.Id, &user.Country, &user.Context, &user.Level, &properties, &user.Candidate)
+	err := row.Scan(&user.ID, &user.Country, &user.Context, &user.Level, &properties, &user.Candidate)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -94,9 +94,9 @@ func (s *persistenseStorage) count() (int, error) {
 	return count, nil
 }
 
-func (s *persistenseStorage) save(user *StorageUser) error {
+func (s *persistenseStorage) save(user *storageUser) error {
 	sqlStatement := `SELECT COUNT(*) FROM users WHERE id = $1;`
-	row := s.db.QueryRow(sqlStatement, user.Id)
+	row := s.db.QueryRow(sqlStatement, user.ID)
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
@@ -110,10 +110,10 @@ func (s *persistenseStorage) save(user *StorageUser) error {
 
 	if count == 0 {
 		sqlStatement = `INSERT INTO users (id, country, context, level, properties, candidate) VALUES ($1, $2, $3, $4, $5, $6)`
-		_, err = s.db.Exec(sqlStatement, user.Id, user.Country, user.Context, user.Level, string(properties), user.Candidate)
+		_, err = s.db.Exec(sqlStatement, user.ID, user.Country, user.Context, user.Level, string(properties), user.Candidate)
 		return err
 	}
 	sqlStatement = `UPDATE users SET country=$2, context=$3, level=$4, properties=$5, candidate=$6 WHERE id = $1`
-	_, err = s.db.Exec(sqlStatement, user.Id, user.Country, user.Context, user.Level, string(properties), user.Candidate)
+	_, err = s.db.Exec(sqlStatement, user.ID, user.Country, user.Context, user.Level, string(properties), user.Candidate)
 	return err
 }

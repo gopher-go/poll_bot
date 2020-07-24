@@ -5,25 +5,25 @@ import (
 	"log"
 )
 
-type Storage struct {
+type storage struct {
 	//users      sync.Map
 	persistent *persistenseStorage
 }
 
-func newStorage() (*Storage, error) {
+func newStorage() (*storage, error) {
 	persistent, err := newPersistenseStoragePq()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Storage{
+	return &storage{
 		//users:      sync.Map{},
 		persistent: persistent,
 	}, nil
 }
 
-type StorageUser struct {
-	Id      string
+type storageUser struct {
+	ID      string
 	Country string
 
 	Level int
@@ -36,14 +36,14 @@ type StorageUser struct {
 	isChanged bool
 }
 
-func (u *StorageUser) validate() error {
-	if u.Id == "" {
+func (u *storageUser) validate() error {
+	if u.ID == "" {
 		return errors.New("Empty user id")
 	}
 	return nil
 }
 
-func (s *Storage) Obtain(id string) (*StorageUser, error) {
+func (s *storage) Obtain(id string) (*storageUser, error) {
 	if id == "" {
 		return nil, errors.New("Unable to obtain empty id")
 	}
@@ -62,8 +62,8 @@ func (s *Storage) Obtain(id string) (*StorageUser, error) {
 		return persistedUser, persistedUser.validate()
 	}
 
-	newUser := &StorageUser{
-		Id:         id,
+	newUser := &storageUser{
+		ID:         id,
 		Properties: map[string]string{},
 	}
 	//s.users.Store(id, newUser)
@@ -82,7 +82,7 @@ func (s *Storage) Obtain(id string) (*StorageUser, error) {
 //}
 
 // internal
-func (s *Storage) fromPersisted(id string) (*StorageUser, error) {
+func (s *storage) fromPersisted(id string) (*storageUser, error) {
 	if s.persistent == nil {
 		return nil, errors.New("persistence not enabled")
 	}
@@ -94,7 +94,8 @@ func (s *Storage) fromPersisted(id string) (*StorageUser, error) {
 	return user, nil
 }
 
-func (s *Storage) Clear(id string) error {
+// Clear removes user from persistent storage
+func (s *storage) Clear(id string) error {
 	//s.users.Delete(id)
 
 	err := s.persistent.clear(id)
@@ -106,7 +107,8 @@ func (s *Storage) Clear(id string) error {
 	return nil
 }
 
-func (s *Storage) PersistCount() (int, error) {
+// PersistCount - shows number of users in persistent storage
+func (s *storage) PersistCount() (int, error) {
 	if s.persistent == nil {
 		return 0, errors.New("persistence not enabled")
 	}
@@ -120,7 +122,8 @@ func (s *Storage) PersistCount() (int, error) {
 	return count, nil
 }
 
-func (s *Storage) Persist(user *StorageUser) error {
+// Persist - save the user in storage
+func (s *storage) Persist(user *storageUser) error {
 	if s.persistent == nil {
 		return errors.New("persistence not enabled")
 	}

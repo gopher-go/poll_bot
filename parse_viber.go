@@ -5,17 +5,20 @@ import (
 	"fmt"
 )
 
+// Message - Viber Message
 type Message struct {
 	Text string `json:"text,omitempty"`
 	Type string `json:"type,omitempty"`
 }
 
+// User - Viber User
 type User struct {
-	Id      string `json:"id,omitempty"`
+	ID      string `json:"id,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Country string `json:"country,omitempty"`
 }
 
+// ViberCallback - Viber Callback
 type ViberCallback struct {
 	Event string `json:"event,omitempty"`
 	User  User   `json:"user,omitempty"`
@@ -25,12 +28,14 @@ type ViberCallback struct {
 	MessageToken int     `json:"message_token,omitempty"`
 }
 
+// ViberCallbackMessage - Viber Callback Message
 type ViberCallbackMessage struct {
 	User User `json:"sender,omitempty"`
 }
 
+// ViberSeenMessage - Viber Seen Message
 type ViberSeenMessage struct {
-	UserId string `json:"user_id,omitempty"`
+	UserID string `json:"user_id,omitempty"`
 }
 
 func parseCallback(b []byte) (*ViberCallback, error) {
@@ -57,7 +62,7 @@ func parseCallback(b []byte) (*ViberCallback, error) {
 		if err != nil {
 			return nil, err
 		}
-		ret.User.Id = m.UserId
+		ret.User.ID = m.UserID
 		return ret, err
 	}
 

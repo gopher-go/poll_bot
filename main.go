@@ -26,7 +26,7 @@ func execute() error {
 	}
 
 	viberKey := os.Getenv("VIBER_KEY")
-	callback_URL := os.Getenv("CALLBACK_URL")
+	callbackURL := os.Getenv("CALLBACK_URL")
 	v := viber.New(viberKey, "Voting bot", "https://thumbs.dreamstime.com/z/human-hand-write-yes-vote-voting-paper-pen-flat-concept-illustration-man-s-red-pen-ballot-check-sign-88802664.jpg")
 	go func() {
 		err := serve(v)
@@ -34,6 +34,6 @@ func execute() error {
 			log.Fatal(err)
 		}
 	}()
-	_, err = v.SetWebhook(callback_URL, nil)
+	_, err = v.SetWebhook(callbackURL, nil)
 	return err
 }
