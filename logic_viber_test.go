@@ -22,12 +22,11 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 	require.Equal(t, reply.text, "Добрый день, Vasya. Добро пожаловать. Укажите, пожалуйста, Ваше гражданство?")
 	require.Equal(t, reply.options, []string{"Беларусь", "Россия", "Украина", "Казахстан", "Другая страна"})
 
-	text := newTextCallback(t, userId, "Привет")
+	text := newTextCallback(t, userId, "Беларусь")
 	require.Equal(t, text.User.Id, userId)
 	reply, err = generateReplyFor(p, s, text)
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Укажите, пожалуйста, Ваше гражданство?")
-	require.Equal(t, reply.options, []string{"Беларусь", "Россия", "Украина", "Казахстан", "Другая страна"})
+	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш возраст")
 
 	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userId))
 	require.NoError(t, err)

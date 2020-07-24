@@ -63,6 +63,7 @@ func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error)
 
 	if c.Event == "unsubscribed" {
 		storageUser.Properties["ConversationStarted"] = "false"
+		storageUser.Level = 0
 		storageUser.isChanged = true
 		return nil, nil
 	}
