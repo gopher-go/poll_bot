@@ -8,6 +8,37 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
+	s, err := newTestStorage()
+	require.NoError(t, err)
+	err = s.init()
+	require.NoError(t, err)
+
+	p := generateOurPoll()
+	userId := "124"
+
+	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Добрый день, Vasya. Добро пожаловать. Укажите, пожалуйста, Ваше гражданство?")
+	require.Equal(t, reply.options, []string{"Беларусь", "Россия", "Украина", "Казахстан", "Другая страна"})
+
+	text := newTextCallback(t, userId, "Привет")
+	require.Equal(t, text.User.Id, userId)
+	reply, err = generateReplyFor(p, s, text)
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Укажите, пожалуйста, Ваше гражданство?")
+	require.Equal(t, reply.options, []string{"Беларусь", "Россия", "Украина", "Казахстан", "Другая страна"})
+
+	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Nil(t, reply)
+
+	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Добрый день, Vasya. Добро пожаловать. Укажите, пожалуйста, Ваше гражданство?")
+	require.Equal(t, reply.options, []string{"Беларусь", "Россия", "Украина", "Казахстан", "Другая страна"})
+}
+
 func TestUserFlowCaseSensitive(t *testing.T) {
 	s, err := newTestStorage()
 	require.NoError(t, err)
@@ -201,6 +232,16 @@ func TestUserFlow(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newSeenCallback(t, userId))
 	require.NoError(t, err)
 	require.Empty(t, reply)
+}
+
+func newUnsubscribeCallback(t *testing.T, id string) *ViberCallback {
+	json := `{"event":"unsubscribed","timestamp":1595347885535,"chat_hostname":"SN-376_","user_id":"%s","message_token":5466394919049723652}`
+	validJson := fmt.Sprintf(json, id)
+
+	ret, err := parseCallback([]byte(validJson))
+	require.NoError(t, err)
+
+	return ret
 }
 
 func newSubscribeCallback(t *testing.T, id string) *ViberCallback {
