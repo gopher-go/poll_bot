@@ -82,7 +82,7 @@ func TestParseViberSeenCallback(t *testing.T) {
 	require.Equal(t, m.User.Id, "3SQNc4FPUQmysaM/AQEhXg==")
 }
 
-const conversationStarted = `{"event":"conversation_started", "context": "context-source", timestamp":1595339165214,"chat_hostname":"SN-376_","message_token":5466358343372472277,"type":"open","user":{"id":"3SQNc4FPUQmysaM/AQEhXg==","name":"Georgy Buranov","avatar":"https://media-direct.cdn.viber.com/download_photo?dlid=3QCUHWfeZ7PCaNtLgR9MjzkImEDqnrC5TWKLxsKqFozLDTzy63xrDEoC8iXw3dfX3SDEkhAwWQn3QsmE6vkxGeaGyoWpDtWX2-_yyjQgGr12c3kkAfbVhPGsuUNSk6V5oReBtg&fltp=jpg&imsz=0000","language":"en-CA","country":"DE","api_version":8},"subscribed":false}`
+const conversationStarted = `{"event":"conversation_started","context":"context-source","timestamp":1595339165214,"chat_hostname":"SN-376_","message_token":5466358343372472277,"type":"open","user":{"id":"3SQNc4FPUQmysaM/AQEhXg==","name":"Georgy Buranov","avatar":"","language":"en-CA","country":"DE","api_version":8},"subscribed":false}`
 
 func TestParseConversationStartedCallback(t *testing.T) {
 	m, err := parseCallback([]byte(conversationStarted))
