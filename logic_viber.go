@@ -68,7 +68,6 @@ func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error)
 
 	if c.Event == "unsubscribed" {
 		storageUser.Properties["ConversationStarted"] = "false"
-		storageUser.Level = 0
 		storageUser.isChanged = true
 		return nil, nil
 	}
@@ -116,7 +115,16 @@ func getViberReplyForLevel(p poll, u *StorageUser, level int, c *ViberCallback) 
 	item := p.getLevel(level)
 	reply := viberReply{text: fmt.Sprintf("Непонятно. Нет уровня %v в вопросах", level)}
 	if item != nil {
-		reply.text = item.question(u, c)
+		var welcome string
+		if u.Properties["ConversationStarted"] != "true" {
+			if c.User.Name == "" {
+				welcome = "Добро пожаловать. "
+			} else {
+				welcome = "Добрый день, " + c.User.Name + ". Добро пожаловать. "
+			}
+		}
+
+		reply.text = welcome + item.question(u, c)
 		reply.options = item.possibleAnswers
 	}
 	return &reply

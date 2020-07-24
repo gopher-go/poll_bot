@@ -34,8 +34,8 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userId))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день, Vasya. Добро пожаловать. Вы гражданин Республики Беларусь?", reply.text)
-	require.Equal(t, []string{"1. Да", "2. Нет"}, reply.options)
+	require.Equal(t, "Добрый день, Vasya. Добро пожаловать. Укажите, пожалуйста, Ваш возраст", reply.text)
+	require.Equal(t, []string{"1. меньше 18", "2. 18-24", "3. 25-34", "4. 35-44", "5. 45-54", "6. 55+"}, reply.options)
 }
 
 func TestUserFlowCaseSensitive(t *testing.T) {

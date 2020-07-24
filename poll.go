@@ -34,16 +34,7 @@ func generateOurPoll() poll {
 
 	ret.add(&pollItem{
 		question: func(user *StorageUser, c *ViberCallback) string {
-			var welcome string
-			if user.Properties["ConversationStarted"] != "true" {
-				if c.User.Name == "" {
-					welcome = "Добро пожаловать. "
-				} else {
-					welcome = "Добрый день, " + c.User.Name + ". Добро пожаловать. "
-				}
-			}
-
-			return welcome + "Вы гражданин Республики Беларусь?"
+			return "Вы гражданин Республики Беларусь?"
 		},
 
 		possibleAnswers: []string{
