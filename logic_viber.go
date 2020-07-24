@@ -56,11 +56,6 @@ func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error)
 		}
 	}()
 
-	if storageUser.Name == "" && c.User.Name != "" {
-		storageUser.Name = c.User.Name
-		storageUser.isChanged = true
-	}
-
 	if storageUser.Country == "" && c.User.Country != "" {
 		storageUser.Country = c.User.Country
 		storageUser.isChanged = true

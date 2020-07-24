@@ -72,7 +72,6 @@ func TestMapStorage(t *testing.T) {
 	require.Equal(t, user.Properties["age"], "")
 	user.Properties["age"] = "16"
 	user.Country = "DE"
-	user.Name = "Georgy"
 
 	err = s.Persist(user)
 	require.NoError(t, err)
@@ -82,7 +81,6 @@ func TestMapStorage(t *testing.T) {
 	require.Equal(t, user.Id, "12")
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
-	require.Equal(t, user.Name, "Georgy")
 
 	count, err := s.PersistCount()
 	require.NoError(t, err)
@@ -101,7 +99,6 @@ func TestMapStorage(t *testing.T) {
 	require.Equal(t, user.Id, "12")
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
-	require.Equal(t, user.Name, "Georgy")
 }
 
 /*

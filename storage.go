@@ -24,7 +24,6 @@ func newStorage() (*Storage, error) {
 
 type StorageUser struct {
 	Id      string
-	Name    string
 	Country string
 
 	Level int
