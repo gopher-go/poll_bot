@@ -42,4 +42,4 @@ workflows:
   main:
     jobs:
       - build:
-            context: Deployment
+          context: Deployment

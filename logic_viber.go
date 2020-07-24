@@ -3,7 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+)
+
+var (
+	ErrPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите предложенный ответ.")
 )
 
 func knownEvent(c *ViberCallback) bool {
@@ -68,6 +73,11 @@ func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error)
 		return nil, nil
 	}
 
+	if c.Event == "conversation_started" {
+		storageUser.Context = c.Context
+		storageUser.isChanged = true
+	}
+
 	if c.Event == "message" {
 		err := analyseAnswer(p, storageUser, c)
 		if err != nil {
@@ -120,21 +130,36 @@ func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
 
 	answer := c.Message.Text
 	normalAnswer := answer
-	if !caseSensitive {
-		answer = strings.ToLower(answer)
-		found := false
-		for _, v := range item.possibleAnswers {
-			if answer == strings.ToLower(v) {
-				normalAnswer = v
-				found = true
-				break
+
+	found := false
+	// handle numeric reply
+	if n, err := strconv.Atoi(answer); err == nil {
+		if n > len(item.possibleAnswers) || n < 1 {
+			return ErrPleaseChooseSuggestedAnswer
+		}
+		normalAnswer = item.possibleAnswers[n-1]
+		found = true
+	}
+
+	if !found {
+		if !caseSensitive {
+			answer = strings.ToLower(answer)
+
+			// handle click reply
+			for _, v := range item.possibleAnswers {
+				if answer == strings.ToLower(v) {
+					normalAnswer = v
+					found = true
+					break
+				}
 			}
+
+			if !found {
+				return ErrPleaseChooseSuggestedAnswer
+			}
+		} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
+			return ErrPleaseChooseSuggestedAnswer
 		}
-		if !found {
-			return errors.New("Пожалуйста выберите предложенный ответ.")
-		}
-	} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
-		return errors.New("Пожалуйста выберите предложенный ответ.")
 	}
 
 	if item.validateAnswer != nil {

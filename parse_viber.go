@@ -21,6 +21,7 @@ type ViberCallback struct {
 	User  User   `json:"user,omitempty"`
 
 	Message      Message `json:"message,omitempty"`
+	Context      string  `json:"context"`
 	MessageToken int     `json:"message_token,omitempty"`
 }
 

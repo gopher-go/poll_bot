@@ -44,20 +44,20 @@ func handleMain(p poll, v *viber.Viber, s *Storage, w http.ResponseWriter, r *ht
 		http.NotFound(w, r)
 		return
 	}
-	bytes, err := ioutil.ReadAll(r.Body)
+	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 		http.Error(w, "can't read body", http.StatusBadRequest)
 		return
 	}
-	if !isJSON(bytes) {
+	if !isJSON(bodyBytes) {
 		http.Error(w, "Not json response", http.StatusBadRequest)
 		return
 	}
 
-	c, err := parseCallback(bytes)
+	c, err := parseCallback(bodyBytes)
 	if err != nil {
-		log.Printf("Error reading callback: %v for input %v", err, string(bytes))
+		log.Printf("Error reading callback: %v for input %v", err, string(bodyBytes))
 		http.Error(w, "can't parse body", http.StatusBadRequest)
 		return
 	}
@@ -69,7 +69,7 @@ func handleMain(p poll, v *viber.Viber, s *Storage, w http.ResponseWriter, r *ht
 
 	reply, err := generateReplyFor(p, s, c)
 	if err != nil {
-		log.Printf("Error generating reply: %v for input %v", err, string(bytes))
+		log.Printf("Error generating reply: %v for input %v", err, string(bodyBytes))
 		http.Error(w, "can't reply", http.StatusBadRequest)
 		return
 	}
