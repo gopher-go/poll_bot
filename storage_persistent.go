@@ -41,7 +41,7 @@ func newPersistenseStorageSqllite() (*persistenseStorage, error) {
 	}, nil
 }
 
-func newPersistenseStoragePq() (*persistenseStorage, error) {
+func newPQUserDAO() (*persistenseStorage, error) {
 	connStr := os.Getenv("DB_CONNECTION")
 	if connStr == "" {
 		return nil, errors.New("DB_CONNECTION is empty")
@@ -78,7 +78,7 @@ func (s *persistenseStorage) load(id string) (*StorageUser, error) {
 	return &user, nil
 }
 
-func (s *persistenseStorage) clear(id string) error {
+func (s *persistenseStorage) delete(id string) error {
 	sqlStatement := `DELETE FROM users WHERE id = $1;`
 	_, err := s.db.Exec(sqlStatement, id)
 	return err
