@@ -32,6 +32,7 @@ type StorageUser struct {
 	Properties map[string]string
 
 	Candidate string
+	Context   string
 
 	isChanged bool
 }
