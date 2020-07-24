@@ -1,26 +1,45 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+# Orb Dependencies
+orbs:
+  gcloud: circleci/gcp-cli@1.0.6
+  gcr: circleci/gcp-gcr@0.0.2
+  go: circleci/go@1.3.0
+
 jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.9
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+      - image: circleci/golang:1.14
     steps:
       - checkout
+      - gcloud/install
+      - gcloud/initialize
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
 
-      # specify any bash command here prefixed with `run: `
-      - run: go get -v -t -d ./...
-      - run: go test -v ./...
+      # Run tests
+      - run:
+          name: Run tests
+          command: |
+            go vet ./...
+            go test ./...
+
+      # Deploy app
+      - run:
+          name: Deploying app
+          command: |
+            if [[ $CIRCLE_BRANCH == fake_branch ]] ; then
+              BUILD_NUM=<< pipeline.number >>
+              echo "Deploying app"
+              sudo apt-get install google-cloud-sdk-app-engine-go
+              gcloud app deploy --project $GOOGLE_PROJECT_ID -q
+            else echo "Not executing on a branch other than master"
+            fi
+
+workflows:
+  version: 2.1
+  main:
+    jobs:
+      - build:
+            context: Deployment
