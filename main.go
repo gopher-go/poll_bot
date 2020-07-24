@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"log"
 	"os"
 	"sync"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 	"github.com/mileusna/viber"
 )
