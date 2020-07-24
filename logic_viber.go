@@ -35,69 +35,60 @@ type viberReply struct {
 	options []string
 }
 
-func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error) {
-	if !knownEvent(c) {
-		return nil, fmt.Errorf("Unknown message %v", c.Event)
+func generateReplyFor(poll poll, storage *Storage, callback *ViberCallback) (*viberReply, error) {
+	if !knownEvent(callback) {
+		return nil, fmt.Errorf("Unknown message %v", callback.Event)
 	}
 
-	if strings.ToLower(c.Message.Text) == "clear" {
-		err := s.Clear(c.User.Id)
+	if strings.ToLower(callback.Message.Text) == "clear" {
+		err := storage.Clear(callback.User.Id)
 		return &viberReply{text: fmt.Sprintf("Your storage cleared with %v", err)}, nil
 	}
 
-	storageUser, err := s.Obtain(c.User.Id)
+	storageUser, err := storage.Obtain(callback.User.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
 		if storageUser.isChanged {
-			_ = s.Persist(storageUser)
+			_ = storage.Persist(storageUser)
 		}
 	}()
 
-	if storageUser.Country == "" && c.User.Country != "" {
-		storageUser.Country = c.User.Country
+	if storageUser.Country == "" && callback.User.Country != "" {
+		storageUser.Country = callback.User.Country
 		storageUser.isChanged = true
 	}
 
-	if c.Event == "unsubscribed" {
+	if callback.Event == "unsubscribed" {
 		storageUser.Properties["ConversationStarted"] = "false"
 		storageUser.isChanged = true
 		return nil, nil
 	}
 
-	if c.Event == "conversation_started" {
-		storageUser.Context = c.Context
+	if callback.Event == "conversation_started" {
+		storageUser.Context = callback.Context
 		storageUser.isChanged = true
 	}
 
-	if c.Event == "message" {
-		err := analyseAnswer(p, storageUser, c)
+	if callback.Event == "message" {
+		err := analyseAnswer(poll, storageUser, callback)
 		if err != nil {
-			reply := getViberReplyForLevel(p, storageUser, storageUser.Level, c)
+			reply, _ := getViberReplyForLevel(poll, storage, storageUser, callback)
 			reply.text = err.Error() + " " + reply.text
 			return reply, nil
 		}
 		storageUser.Level++
 		storageUser.isChanged = true
-		if storageUser.Level >= p.size {
-			storageUser.isChanged = true
-
-			totalCount, err := s.PersistCount()
-			if err != nil {
-				return nil, err
-			}
-			text := fmt.Sprintf("Спасибо за голосование! Уже проголосовало %d человек", totalCount)
-			return &viberReply{text: text}, nil
-		}
-
-		reply := getViberReplyForLevel(p, storageUser, storageUser.Level, c)
-		return reply, nil
+		return getViberReplyForLevel(poll, storage, storageUser, callback)
 	}
 
 	if storageUser.Properties["ConversationStarted"] != "true" {
-		reply := getViberReplyForLevel(p, storageUser, storageUser.Level, c)
+		reply, err := getViberReplyForLevel(poll, storage, storageUser, callback)
+		if err != nil {
+			return nil, err
+		}
 		storageUser.Properties["ConversationStarted"] = "true"
 		storageUser.isChanged = true
 		return reply, nil
@@ -106,23 +97,32 @@ func generateReplyFor(p poll, s *Storage, c *ViberCallback) (*viberReply, error)
 	return nil, nil
 }
 
-func getViberReplyForLevel(p poll, u *StorageUser, level int, c *ViberCallback) *viberReply {
-	item := p.getLevel(level)
-	reply := viberReply{text: fmt.Sprintf("Непонятно. Нет уровня %v в вопросах", level)}
-	if item != nil {
-		var welcome string
-		if u.Properties["ConversationStarted"] != "true" {
-			if c.User.Name == "" {
-				welcome = "Добро пожаловать. "
-			} else {
-				welcome = "Добрый день, " + c.User.Name + ". Добро пожаловать. "
-			}
+func getViberReplyForLevel(p poll, s *Storage, u *StorageUser, c *ViberCallback) (*viberReply, error) {
+	var welcome string
+	if u.Properties["ConversationStarted"] != "true" {
+		if c.User.Name == "" {
+			welcome = "Добро пожаловать. "
+		} else {
+			welcome = "Добрый день, " + c.User.Name + ". Добро пожаловать. "
 		}
+	}
 
+	if p.isFinishedFor(u) {
+		totalCount, err := s.PersistCount()
+		if err != nil {
+			return nil, err
+		}
+		text := welcome + fmt.Sprintf("Спасибо за голосование! Уже проголосовало %d человек", totalCount)
+		return &viberReply{text: text}, nil
+	}
+
+	item := p.getLevel(u.Level)
+	reply := viberReply{text: fmt.Sprintf("Непонятно. Нет уровня %v в вопросах", u.Level)}
+	if item != nil {
 		reply.text = welcome + item.question(u, c)
 		reply.options = item.possibleAnswers
 	}
-	return &reply
+	return &reply, nil
 }
 
 func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {

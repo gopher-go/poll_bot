@@ -160,6 +160,13 @@ func TestCaseInsensitive(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Спасибо за голосование! Уже проголосовало 1 человек")
 
+	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Nil(t, reply)
+
+	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Equal(t, "Добрый день, Vasya. Добро пожаловать. Спасибо за голосование! Уже проголосовало 1 человек", reply.text)
 }
 
 func TestUserFlow(t *testing.T) {

@@ -27,6 +27,10 @@ func (p *poll) getLevel(level int) *pollItem {
 	return p.items[level]
 }
 
+func (p *poll) isFinishedFor(u *StorageUser) bool {
+	return u.Level >= p.size
+}
+
 func generateOurPoll() poll {
 	ret := poll{
 		items: map[int]*pollItem{},
