@@ -137,7 +137,7 @@ func analyseAnswer(p poll, u *StorageUser, c *ViberCallback) error {
 		if n > len(item.possibleAnswers) || n < 1 {
 			return ErrPleaseChooseSuggestedAnswer
 		}
-		normalAnswer = strings.ToLower(item.possibleAnswers[n-1])
+		normalAnswer = item.possibleAnswers[n-1]
 		found = true
 	}
 

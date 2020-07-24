@@ -254,6 +254,51 @@ func TestUserFlow(t *testing.T) {
 	require.Empty(t, reply)
 }
 
+func TestNumericReplies(t *testing.T) {
+	s, err := newTestStorage()
+	require.NoError(t, err)
+	err = s.init()
+	require.NoError(t, err)
+
+	p := generateOurPoll()
+
+	userId := "123"
+
+	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userId))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Добрый день, Vasya. Добро пожаловать. Вы гражданин Республики Беларусь?")
+
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "Привет"))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Вы гражданин Республики Беларусь?")
+	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "2"))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Только граждание Беларуси могут принимать участие! Вы гражданин Республики Беларусь?")
+	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "120"))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Пожалуйста выберите предложенный ответ. Вы гражданин Республики Беларусь?")
+	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "1"))
+	require.NoError(t, err)
+	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш возраст")
+
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userId, "4"))
+	require.NoError(t, err)
+	require.Equal(t, "Примете ли Вы участие в предстоящих выборах Президента?", reply.text)
+
+	user, err := s.fromPersisted(userId)
+	require.NoError(t, err)
+
+	require.Equal(t, user.Id, userId)
+	require.Equal(t, 2, user.Level)
+	require.Equal(t, user.Properties["age"], "4. 35-44")
+}
+
 func newUnsubscribeCallback(t *testing.T, id string) *ViberCallback {
 	json := `{"event":"unsubscribed","timestamp":1595347885535,"chat_hostname":"SN-376_","user_id":"%s","message_token":5466394919049723652}`
 	validJson := fmt.Sprintf(json, id)
