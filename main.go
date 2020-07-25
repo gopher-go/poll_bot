@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/andrewkav/viber"
 	"github.com/joho/godotenv"
-	"github.com/mileusna/viber"
 )
 
 var caseSensitive = true
@@ -17,6 +17,22 @@ func main() {
 		log.Fatal(err)
 	}
 	<-make(chan int)
+}
+
+func setViberWebhook(v *viber.Viber, url string) error {
+	req := viber.WebhookReq{
+		URL:        url,
+		EventTypes: nil,
+		SendName:   false,
+		SendPhoto:  false,
+	}
+	_, err := v.PostData("https://chatapi.viber.com/pa/set_webhook", req)
+	if err != nil {
+		return err
+	}
+
+	return err
+
 }
 
 func execute() error {
@@ -40,6 +56,6 @@ func execute() error {
 			log.Fatal(err)
 		}
 	}()
-	_, err = v.SetWebhook(callbackURL, nil)
-	return err
+
+	return setViberWebhook(v, callbackURL)
 }

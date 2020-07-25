@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/mileusna/viber"
+	"github.com/andrewkav/viber"
 )
 
 func serve(v *viber.Viber, ud userDAO) error {

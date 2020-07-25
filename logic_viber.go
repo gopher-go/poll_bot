@@ -112,7 +112,10 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		if err != nil {
 			return nil, err
 		}
-		text := "Добрый день! \nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!"
+		text := "Спасибо, ваш голос учтен!"
+		if welcome != "" {
+			text = welcome + "\n" + "Вы уже приняли участие в Народном опросе. " + text
+		}
 		if totalCount > 500 {
 			text += fmt.Sprintf("\nНас уже %d человек!", totalCount)
 		}

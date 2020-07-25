@@ -1,4 +1,6 @@
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
+github.com/andrewkav/viber v1.0.0 h1:GLMiE6Y4xy6aYwgjtydYomLJY3BYox6hk9Ie0DnPEZ0=
+github.com/andrewkav/viber v1.0.0/go.mod h1:PeT79IOT1OaeoUlAcF0pI+dOQhs6p0nAp8cCxh7qdoE=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -37,8 +39,6 @@ github.com/lib/pq v1.7.1 h1:FvD5XTVTDt+KON6oIoOmHq6B6HzGuYEhuTMpEG0yuBQ=
 github.com/lib/pq v1.7.1/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/mattn/go-sqlite3 v1.14.0 h1:mLyGNKR8+Vv9CAU7PphKa2hkEqxxhn8i32J6FPj1/QA=
 github.com/mattn/go-sqlite3 v1.14.0/go.mod h1:JIl7NbARA7phWnGvh0LKTyg7S9BA+6gx71ShQilpsus=
-github.com/mileusna/viber v0.0.0-20180604154358-b816488ead81 h1:gEuK8PQaSNTrepyBBn/eR91cOmK45//YdeRgZaFPPOk=
-github.com/mileusna/viber v0.0.0-20180604154358-b816488ead81/go.mod h1:iBRklh5QYDoCpCMUtXlfbqDllFO7Dq3A7W45rBMzYvw=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.10.1 h1:q/mM8GF/n0shIN8SaAZ0V+jnLPzen6WIVZdiwrRlMlo=
 github.com/onsi/ginkgo v1.10.1/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
