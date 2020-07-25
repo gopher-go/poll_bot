@@ -175,7 +175,7 @@ func generateOurPoll() poll {
 			"2. Профессионально-техническое",
 			"3. Среднее специальное",
 			"4. Высшее",
-			"6. Другое",
+			"5. Другое",
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
 			u.Properties["education_level"] = answer
