@@ -100,11 +100,7 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback) (*viberReply, error) {
 	var welcome string
 	if u.Properties["ConversationStarted"] != "true" {
-		if c.User.Name == "" {
-			welcome = "Добро пожаловать. "
-		} else {
-			welcome = "Добрый день, " + c.User.Name + ". Добро пожаловать. "
-		}
+		welcome = "Добрый день!\n"
 	}
 
 	if p.isFinishedFor(u) {
@@ -114,7 +110,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		}
 		text := "Спасибо, ваш голос учтен!"
 		if welcome != "" {
-			text = welcome + "\n" + "Вы уже приняли участие в Народном опросе. " + text
+			text = welcome + "Вы уже приняли участие в Народном опросе. " + text
 		}
 		if totalCount > 500 {
 			text += fmt.Sprintf("\nНас уже %d человек!", totalCount)
