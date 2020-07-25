@@ -35,7 +35,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
 	require.Equal(t, "Добрый день!\nУкажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"1. младше 18", "2. 18-24", "3. 25-34", "4. 35-44", "5. 45-55", "6. старше 55"}, reply.options)
+	require.Equal(t, []string{"1. младше 18", "2. 18-25", "3. 26-40", "4. 41-55", "5. старше 55"}, reply.options)
 }
 
 func TestUserFlowCaseSensitive(t *testing.T) {
@@ -63,7 +63,7 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Да"))
 	require.NoError(t, err)
 	require.Equal(t, "Укажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"1. младше 18", "2. 18-24", "3. 25-34", "4. 35-44", "5. 45-55", "6. старше 55"}, reply.options)
+	require.Equal(t, []string{"1. младше 18", "2. 18-25", "3. 26-40", "4. 41-55", "5. старше 55"}, reply.options)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
@@ -111,7 +111,7 @@ func TestCaseInsensitive(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "Вам должно быть 18 или больше.\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 35-44"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 41-55"))
 	require.NoError(t, err)
 	require.Equal(t, "К какому типу относится ваш населенный пункт?", reply.text)
 	require.Equal(t, reply.options, []string{"1. Областной центр", "2. Город или городской поселок", "3. Агрогородок / Село / Деревня", "4. Проживаю за пределами РБ"})
@@ -150,7 +150,7 @@ func TestCaseInsensitive(t *testing.T) {
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
 	require.Equal(t, user.ID, userID)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
+	require.Equal(t, user.Properties["age"], "4. 41-55")
 	require.Equal(t, 8, user.Level)
 	require.Equal(t, user.Candidate, "1. Дмитриев")
 
@@ -194,7 +194,7 @@ func TestUserFlow(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Вам должно быть 18 или больше.\n\nУкажите, пожалуйста, Ваш возраст")
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 35-44"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 41-55"))
 	require.NoError(t, err)
 
 	require.Equal(t, "К какому типу относится ваш населенный пункт?", reply.text)
@@ -204,7 +204,7 @@ func TestUserFlow(t *testing.T) {
 
 	require.Equal(t, user.ID, userID)
 	fmt.Println(user)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
+	require.Equal(t, user.Properties["age"], "4. 41-55")
 	require.Equal(t, 2, user.Level)
 
 	seenCallback := newSeenCallback(t, userID)
@@ -230,7 +230,7 @@ func TestUserFlow(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, user.ID, userID)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
+	require.Equal(t, user.Properties["age"], "4. 41-55")
 	require.Equal(t, 5, user.Level)
 	require.Equal(t, "3. Лукашенко", user.Candidate)
 
@@ -286,7 +286,7 @@ func TestNumericReplies(t *testing.T) {
 
 	require.Equal(t, user.ID, userID)
 	require.Equal(t, 2, user.Level)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
+	require.Equal(t, user.Properties["age"], "4. 41-55")
 }
 
 func newUnsubscribeCallback(t *testing.T, id string) *ViberCallback {

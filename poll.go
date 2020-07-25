@@ -58,11 +58,10 @@ func generateOurPoll() poll {
 		},
 		possibleAnswers: []string{
 			"1. младше 18",
-			"2. 18-24",
-			"3. 25-34",
-			"4. 35-44",
-			"5. 45-55",
-			"6. старше 55",
+			"2. 18-25",
+			"3. 26-40",
+			"4. 41-55",
+			"5. старше 55",
 		},
 		validateAnswer: func(answer string) error {
 			if answer == "1. младше 18" {
