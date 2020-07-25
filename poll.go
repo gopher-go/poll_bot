@@ -46,7 +46,7 @@ func generateOurPoll() poll {
 			"2. Нет",
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
-			u.Properties["isBelurussia"] = answer
+			u.Properties["isBelarus"] = answer
 			u.isChanged = true
 			return nil
 		},
