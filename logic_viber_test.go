@@ -137,12 +137,12 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "3. Агрогородок / село / Деревня"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Ваш уровень образования?")
-	require.Equal(t, reply.options, []string{"1. Базовое / Среднее общее (школа)", "2. Профессионально-техническое", "3. Среднее специальное", "4. Высшее", "6. Другое"})
+	require.Equal(t, "Ваш уровень образования?", reply.text)
+	require.Equal(t, []string{"1. Базовое / Среднее общее (школа)", "2. Профессионально-техническое", "3. Среднее специальное", "4. Высшее", "5. Другое"}, reply.options)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "3. Среднее специальное"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Укажите, пожалуйста, общий совокупный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)")
+	require.Equal(t, "Укажите, пожалуйста, общий совокупный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)", reply.text)
 	require.Equal(t, reply.options, []string{"1. До 500 бел. руб.", "2. 500 - 1000 бел. руб.", "3. 1000 - 2000 бел. руб.", "4. Выше 2000 бел.руб.", "5. Не хочу отвечать на этот вопрос"})
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. До 500 бел. руб."))
