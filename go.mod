@@ -3,6 +3,7 @@ module poll_bot
 go 1.14
 
 require (
+	github.com/andrewkav/viber v1.0.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -11,7 +12,6 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.7.1
 	github.com/mattn/go-sqlite3 v1.14.0
-	github.com/mileusna/viber v0.0.0-20180604154358-b816488ead81
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/proullon/ramsql v0.0.0-20181213202341-817cee58a244
