@@ -5,10 +5,6 @@ import (
 	"log"
 )
 
-var (
-	newUserDAO func() (userDAO, error)
-)
-
 type userDAO interface {
 	load(id string) (*StorageUser, error)
 	delete(id string) error
@@ -21,15 +17,11 @@ type Storage struct {
 	userDAO userDAO
 }
 
-func newStorage() (*Storage, error) {
-	userDAO, err := newUserDAO()
-	if err != nil {
-		return nil, err
-	}
+func newStorage(ud userDAO) (*Storage, error) {
 
 	return &Storage{
 		//users:      sync.Map{},
-		userDAO: userDAO,
+		userDAO: ud,
 	}, nil
 }
 

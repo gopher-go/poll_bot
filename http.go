@@ -10,8 +10,8 @@ import (
 	"github.com/mileusna/viber"
 )
 
-func serve(v *viber.Viber) error {
-	s, err := newStorage()
+func serve(v *viber.Viber, ud userDAO) error {
+	s, err := newStorage(ud)
 	if err != nil {
 		return err
 	}

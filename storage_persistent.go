@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"os"
 
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -41,8 +40,7 @@ func newPersistenseStorageSqllite() (*persistenseStorage, error) {
 	}, nil
 }
 
-func newPQUserDAO() (*persistenseStorage, error) {
-	connStr := os.Getenv("DB_CONNECTION")
+func newPQUserDAO(connStr string) (*persistenseStorage, error) {
 	if connStr == "" {
 		return nil, errors.New("DB_CONNECTION is empty")
 	}
