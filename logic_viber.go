@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	errPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите предложенный ответ.")
+	errPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите один из предложенных ответов или введите его номер.")
 )
 
 func knownEvent(c *ViberCallback) bool {
@@ -40,7 +40,7 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 		return nil, fmt.Errorf("Unknown message %v", callback.Event)
 	}
 
-	if strings.ToLower(callback.Message.Text) == "clear" {
+	if strings.ToLower(callback.Message.Text) == "i'm a tester, clear it" {
 		err := storage.Clear(callback.User.ID)
 		return &viberReply{text: fmt.Sprintf("Your storage cleared with %v", err)}, nil
 	}
@@ -76,7 +76,7 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 		err := analyseAnswer(poll, storageUser, callback)
 		if err != nil {
 			reply, _ := getViberReplyForLevel(poll, storage, storageUser, callback)
-			reply.text = err.Error() + " " + reply.text
+			reply.text = err.Error() + "\n\n" + reply.text
 			return reply, nil
 		}
 		storageUser.Level++
@@ -112,7 +112,10 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		if err != nil {
 			return nil, err
 		}
-		text := welcome + fmt.Sprintf("Спасибо за голосование! Уже проголосовало %d человек", totalCount)
+		text := "Добрый день! \nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!"
+		if totalCount > 500 {
+			text += fmt.Sprintf("\nНас уже %d человек!", totalCount)
+		}
 		return &viberReply{text: text}, nil
 	}
 
