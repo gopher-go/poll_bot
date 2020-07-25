@@ -7,9 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	_ "github.com/proullon/ramsql/driver"
+	"github.com/stretchr/testify/require"
 )
 
 func randomString() string {
@@ -36,15 +35,20 @@ func newTestPersistenseStorage() (*persistenseStorage, error) {
 	}, nil
 }
 
+var (
+	testPersistentStorage *persistenseStorage
+)
+
 func newTestStorage() (*storage, error) {
-	persistenseStorage, err := newTestPersistenseStorage()
+	var err error
+	testPersistentStorage, err = newTestPersistenseStorage()
 	if err != nil {
 		return nil, err
 	}
 
 	return &storage{
 		//users:      sync.Map{},
-		persistent: persistenseStorage,
+		userDAO: testPersistentStorage,
 	}, nil
 }
 
@@ -52,7 +56,7 @@ func (s *storage) init() error {
 	batch := []string{initDbSQL}
 
 	for _, b := range batch {
-		_, err := s.persistent.db.Exec(b)
+		_, err := testPersistentStorage.db.Exec(b)
 		if err != nil {
 			return err
 		}

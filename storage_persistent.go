@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"os"
 
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -40,8 +39,7 @@ func newPersistenseStorageSqllite() (*persistenseStorage, error) {
 	}, nil
 }
 
-func newPersistenseStoragePq() (*persistenseStorage, error) {
-	connStr := os.Getenv("DB_CONNECTION")
+func newPQUserDAO(connStr string) (*persistenseStorage, error) {
 	if connStr == "" {
 		return nil, errors.New("DB_CONNECTION is empty")
 	}
@@ -77,7 +75,7 @@ func (s *persistenseStorage) load(id string) (*storageUser, error) {
 	return &user, nil
 }
 
-func (s *persistenseStorage) clear(id string) error {
+func (s *persistenseStorage) delete(id string) error {
 	sqlStatement := `DELETE FROM users WHERE id = $1;`
 	_, err := s.db.Exec(sqlStatement, id)
 	return err

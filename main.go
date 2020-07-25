@@ -27,9 +27,15 @@ func execute() error {
 
 	viberKey := os.Getenv("VIBER_KEY")
 	callbackURL := os.Getenv("CALLBACK_URL")
+
+	var ud userDAO
+	ud, err = newPQUserDAO(os.Getenv("DB_CONNECTION"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	v := viber.New(viberKey, "Voting bot", "https://thumbs.dreamstime.com/z/human-hand-write-yes-vote-voting-paper-pen-flat-concept-illustration-man-s-red-pen-ballot-check-sign-88802664.jpg")
 	go func() {
-		err := serve(v)
+		err := serve(v, ud)
 		if err != nil {
 			log.Fatal(err)
 		}

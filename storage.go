@@ -5,20 +5,23 @@ import (
 	"log"
 )
 
-type storage struct {
-	//users      sync.Map
-	persistent *persistenseStorage
+type userDAO interface {
+	load(id string) (*storageUser, error)
+	delete(id string) error
+	count() (int, error)
+	save(user *storageUser) error
 }
 
-func newStorage() (*storage, error) {
-	persistent, err := newPersistenseStoragePq()
-	if err != nil {
-		return nil, err
-	}
+type storage struct {
+	//users      sync.Map
+	userDAO userDAO
+}
+
+func newStorage(ud userDAO) (*storage, error) {
 
 	return &storage{
 		//users:      sync.Map{},
-		persistent: persistent,
+		userDAO: ud,
 	}, nil
 }
 
@@ -83,12 +86,12 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 
 // internal
 func (s *storage) fromPersisted(id string) (*storageUser, error) {
-	if s.persistent == nil {
+	if s.userDAO == nil {
 		return nil, errors.New("persistence not enabled")
 	}
-	user, err := s.persistent.load(id)
+	user, err := s.userDAO.load(id)
 	if err != nil {
-		log.Printf("Unable to load persistent user %v", err)
+		log.Printf("Unable to load userDAO user %v", err)
 		return nil, nil
 	}
 	return user, nil
@@ -98,9 +101,9 @@ func (s *storage) fromPersisted(id string) (*storageUser, error) {
 func (s *storage) Clear(id string) error {
 	//s.users.Delete(id)
 
-	err := s.persistent.clear(id)
+	err := s.userDAO.delete(id)
 	if err != nil {
-		log.Printf("Unable to clear persistent user %v", err)
+		log.Printf("Unable to clear userDAO user %v", err)
 		return nil
 	}
 
@@ -109,13 +112,13 @@ func (s *storage) Clear(id string) error {
 
 // PersistCount - shows number of users in persistent storage
 func (s *storage) PersistCount() (int, error) {
-	if s.persistent == nil {
+	if s.userDAO == nil {
 		return 0, errors.New("persistence not enabled")
 	}
 
-	count, err := s.persistent.count()
+	count, err := s.userDAO.count()
 	if err != nil {
-		log.Printf("Unable to count persistent user %v", err)
+		log.Printf("Unable to count userDAO user %v", err)
 		return 0, nil
 	}
 
@@ -124,7 +127,7 @@ func (s *storage) PersistCount() (int, error) {
 
 // Persist - save the user in storage
 func (s *storage) Persist(user *storageUser) error {
-	if s.persistent == nil {
+	if s.userDAO == nil {
 		return errors.New("persistence not enabled")
 	}
 
@@ -133,9 +136,9 @@ func (s *storage) Persist(user *storageUser) error {
 	//	return fmt.Errorf("%v missed in cache", id)
 	//}
 
-	err := s.persistent.save(user)
+	err := s.userDAO.save(user)
 	if err != nil {
-		log.Printf("Unable to save persistent user %v", err)
+		log.Printf("Unable to save userDAO user %v", err)
 		return nil
 	}
 
