@@ -57,15 +57,15 @@ func generateOurPoll() poll {
 			return "Укажите, пожалуйста, Ваш возраст"
 		},
 		possibleAnswers: []string{
-			"1. меньше 18",
+			"1. младше 18",
 			"2. 18-24",
 			"3. 25-34",
 			"4. 35-44",
-			"5. 45-54",
-			"6. 55+",
+			"5. 45-55",
+			"6. старше 55",
 		},
 		validateAnswer: func(answer string) error {
-			if answer == "1. меньше 18" {
+			if answer == "1. младше 18" {
 				return errors.New("Вам должно быть 18 или больше.")
 			}
 			return nil
@@ -79,15 +79,16 @@ func generateOurPoll() poll {
 
 	ret.add(&pollItem{
 		question: func(user *storageUser, c *ViberCallback) string {
-			return "Примете ли Вы участие в предстоящих выборах Президента?"
+			return "К какому типу относится ваш населенный пункт?"
 		},
 		possibleAnswers: []string{
-			"1. Да",
-			"2. Нет",
-			"3. Затрудняюсь ответить",
+			"1. Областной центр",
+			"2. Город или городской поселок",
+			"3. Агрогородок / Село / Деревня",
+			"4. Проживаю за пределами РБ",
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
-			u.Properties["will_take_part"] = answer
+			u.Properties["residence_location_type"] = answer
 			u.isChanged = true
 			return nil
 		},
@@ -105,6 +106,7 @@ func generateOurPoll() poll {
 			"5. Черечень",
 			"6. Против всех",
 			"7. Затрудняюсь ответить",
+			"8. Не пойду голосовать",
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
 			u.Candidate = answer
@@ -143,24 +145,7 @@ func generateOurPoll() poll {
 			"8. Проживаю за пределами РБ",
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
-			u.Properties["living_location"] = answer
-			u.isChanged = true
-			return nil
-		},
-	})
-
-	ret.add(&pollItem{
-		question: func(user *storageUser, c *ViberCallback) string {
-			return "К какому типу относится ваш населенный пункт? Если живете в Минске - выберите Минск."
-		},
-		possibleAnswers: []string{
-			"1. Областной центр",
-			"2. Город или городской поселок",
-			"3. Агрогородок / Село / Деревня",
-			"4. Проживаю за пределами РБ",
-		},
-		persistAnswer: func(answer string, u *storageUser) error {
-			u.Properties["living_location_type"] = answer
+			u.Properties["residence_location"] = answer
 			u.isChanged = true
 			return nil
 		},
@@ -186,7 +171,7 @@ func generateOurPoll() poll {
 
 	ret.add(&pollItem{
 		question: func(user *storageUser, c *ViberCallback) string {
-			return "Укажите, пожалуйста, общий совокупный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)"
+			return "Укажите, пожалуйста, общий совокупный месячный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)"
 		},
 		possibleAnswers: []string{
 			"1. До 500 бел. руб.",
