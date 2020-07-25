@@ -39,21 +39,21 @@ var (
 	testPersistentStorage *persistenseStorage
 )
 
-func newTestStorage() (*Storage, error) {
+func newTestStorage() (*storage, error) {
 	var err error
 	testPersistentStorage, err = newTestPersistenseStorage()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Storage{
+	return &storage{
 		//users:      sync.Map{},
 		userDAO: testPersistentStorage,
 	}, nil
 }
 
-func (s *Storage) init() error {
-	batch := []string{initDbSql}
+func (s *storage) init() error {
+	batch := []string{initDbSQL}
 
 	for _, b := range batch {
 		_, err := testPersistentStorage.db.Exec(b)
@@ -72,21 +72,19 @@ func TestMapStorage(t *testing.T) {
 
 	user, err := s.Obtain("12")
 	require.NoError(t, err)
-	require.Equal(t, user.Id, "12")
+	require.Equal(t, user.ID, "12")
 	require.Equal(t, user.Properties["age"], "")
 	user.Properties["age"] = "16"
 	user.Country = "DE"
-	user.Name = "Georgy"
 
 	err = s.Persist(user)
 	require.NoError(t, err)
 
 	user, err = s.Obtain("12")
 	require.NoError(t, err)
-	require.Equal(t, user.Id, "12")
+	require.Equal(t, user.ID, "12")
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
-	require.Equal(t, user.Name, "Georgy")
 
 	count, err := s.PersistCount()
 	require.NoError(t, err)
@@ -102,10 +100,9 @@ func TestMapStorage(t *testing.T) {
 	// then load persisted
 	user, err = s.fromPersisted("12")
 	require.NoError(t, err)
-	require.Equal(t, user.Id, "12")
+	require.Equal(t, user.ID, "12")
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
-	require.Equal(t, user.Name, "Georgy")
 }
 
 /*

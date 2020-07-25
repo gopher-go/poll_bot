@@ -28,7 +28,8 @@ func serve(v *viber.Viber, ud userDAO) error {
 	}
 
 	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -39,7 +40,7 @@ func isJSON(s []byte) bool {
 	return json.Unmarshal(s, &js) == nil
 }
 
-func handleMain(p poll, v *viber.Viber, s *Storage, w http.ResponseWriter, r *http.Request) {
+func handleMain(p poll, v *viber.Viber, s *storage, w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
@@ -78,9 +79,9 @@ func handleMain(p poll, v *viber.Viber, s *Storage, w http.ResponseWriter, r *ht
 		if len(reply.options) > 0 {
 			message.SetKeyboard(keyboardFromOptions(v, reply.options))
 		}
-		_, err = v.SendMessage(c.User.Id, message)
+		_, err = v.SendMessage(c.User.ID, message)
 		if err != nil {
-			log.Printf("Error sending message %v to user id %s", err, c.User.Id)
+			log.Printf("Error sending message %v to user id %s", err, c.User.ID)
 			http.Error(w, "can't reply", http.StatusBadRequest)
 			return
 		}
