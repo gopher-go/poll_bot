@@ -97,10 +97,6 @@ workflows:
           context: Deployment
           requires:
             - build
-      - staging:
-          context: Deployment
-          requires:
-            - build
       - send-approval-link:
           context: Deployment
           filters:
@@ -115,7 +111,12 @@ workflows:
           type: approval
           requires:
             - send-approval-link
-            - staging
+            - dev
+      - staging:
+          context: Deployment
+          requires:
+            - build
+            - hold
 #      - prod:
 #          context: Deployment
 #          requires:
