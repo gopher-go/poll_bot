@@ -88,14 +88,41 @@ func handleMain(p poll, v *viber.Viber, s *storage, w http.ResponseWriter, r *ht
 	}
 }
 
+func calculateColsAndRows(optCount int) (cols int, rows int) {
+	if optCount <= 2 {
+		cols = 3
+		rows = 2
+
+		return
+	}
+
+	cols = 3
+	rows = 1
+
+	return
+}
+
 func keyboardFromOptions(v *viber.Viber, options []string) *viber.Keyboard {
 	ret := v.NewKeyboard("#FFFFFF", true)
-	colSize := len(options)
-	if colSize > 6 {
-		colSize = 6
-	}
 	for _, opt := range options {
-		b := v.NewTextButton(colSize, 1, viber.Reply, opt, opt)
+		cornerRadius := 2
+		// columns and rows to occupy by a single button
+		cols, rows := calculateColsAndRows(len(options))
+		b := &viber.Button{
+			Columns:    cols,
+			Rows:       rows,
+			ActionType: viber.Reply,
+			ActionBody: opt,
+			Image:      "",
+			Text:       opt,
+			TextSize:   viber.Regular,
+			Frame: &viber.ButtonFrame{
+				CornerRadius: &cornerRadius,
+			},
+			TextVAlign: "",
+			TextHAlign: "",
+			BgColor:    "#9482F8",
+		}
 		ret.AddButton(b)
 	}
 	return ret
