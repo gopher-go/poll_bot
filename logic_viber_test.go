@@ -145,7 +145,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "До 500 бел. руб."))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!\nНас уже 569 человек!")
+	require.Equal(t, "Спасибо за участие в нашем опросе!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!", reply.text)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
@@ -156,7 +156,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!\nНас уже 569 человек!")
+	require.Equal(t, reply.text, "Спасибо за участие в нашем опросе!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!")
 
 	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userID))
 	require.NoError(t, err)
@@ -164,7 +164,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!\nНас уже 569 человек!", reply.text)
+	require.Equal(t, "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!", reply.text)
 }
 
 func TestUserFlow(t *testing.T) {
