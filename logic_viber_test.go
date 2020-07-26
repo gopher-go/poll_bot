@@ -119,7 +119,7 @@ func TestCaseInsensitive(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, "За кого Вы планируете проголосовать?", reply.text)
-	require.Equal(t, []string{"Дмитриев", "Канопацкая", "Лукашенко", "Тихановская", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
+	require.Equal(t, []string{"Дмитриев", "Тихановская", "Лукашенко", "Канопацкая", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Дмитриев"))
 	require.NoError(t, err)
@@ -216,7 +216,7 @@ func TestUserFlow(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Агрогородок / Село / Деревня"))
 	require.NoError(t, err)
 	require.Equal(t, "За кого Вы планируете проголосовать?", reply.text)
-	require.Equal(t, []string{"Дмитриев", "Канопацкая", "Лукашенко", "Тихановская", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
+	require.Equal(t, []string{"Дмитриев", "Тихановская", "Лукашенко", "Канопацкая", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Лукашенко"))
 	require.NoError(t, err)
