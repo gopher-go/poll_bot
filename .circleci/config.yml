@@ -63,27 +63,27 @@ jobs:
   staging:
     docker:
       - image: circleci/golang:1.14
-      steps:
-        - checkout
-        - gcloud/install
-        - gcloud/initialize
-        - go/load-cache
-        - go/mod-download
-        - go/save-cache
+    steps:
+      - checkout
+      - gcloud/install
+      - gcloud/initialize
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
 
         # Deploy app staging
-        - run:
-            name: Deploying app staging (Narodny opros)
-            command: |
-              if [[ $CIRCLE_BRANCH == production ]] ; then
-                BUILD_NUM=<< pipeline.number >>
-                echo "Create .env file"
-                sh ./deploy/create_env_file_stag.sh
-                echo "Deploying app staging (Narodny opros)"
-                sudo apt-get install google-cloud-sdk-app-engine-go
-                gcloud app deploy --project $GOOGLE_PROJECT_ID staging.yml -q
-              else echo "Not executing on a branch other than master"
-              fi
+      - run:
+          name: Deploying app staging (Narodny opros)
+          command: |
+            if [[ $CIRCLE_BRANCH == production ]] ; then
+              BUILD_NUM=<< pipeline.number >>
+              echo "Create .env file"
+              sh ./deploy/create_env_file_stag.sh
+              echo "Deploying app staging (Narodny opros)"
+              sudo apt-get install google-cloud-sdk-app-engine-go
+              gcloud app deploy --project $GOOGLE_PROJECT_ID staging.yml -q
+            else echo "Not executing on a branch other than master"
+            fi
 
 # TODO the first step is dev(Free elections) - > approval - > staging(Narodny opros) - > approval - >  prod
 workflows:
