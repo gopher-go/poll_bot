@@ -1,8 +1,0 @@
-CREATE TABLE users (
-	id TEXT PRIMARY KEY,
-	country VARCHAR(10) NOT NULL,
-	name VARCHAR(254) NOT NULL,
-	level INT NOT NULL,
-	properties JSON NOT NULL,
-	candidate TEXT NOT NULL
-);
