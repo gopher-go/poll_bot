@@ -101,13 +101,13 @@ workflows:
           context: Deployment
           filters:
             branches:
-              only: master
+              only: production
           requires:
             - dev
       - hold:
           filters:
             branches:
-              only: master
+              only: production
           type: approval
           requires:
             - send-approval-link
