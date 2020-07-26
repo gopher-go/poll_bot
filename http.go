@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -115,7 +114,7 @@ func keyboardFromOptions(v *viber.Viber, options []string) *viber.Keyboard {
 			ActionType: viber.Reply,
 			ActionBody: opt,
 			Image:      "",
-			Text:       fmt.Sprintf(`<font color="#FFFFFF">%s</font>`, opt),
+			Text:       opt,
 			TextSize:   viber.Regular,
 			Frame: &viber.ButtonFrame{
 				CornerRadius: &cornerRadius,
