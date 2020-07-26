@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	errPleaseChooseSuggestedAnswer = errors.New("Пожалуйста выберите один из предложенных ответов или введите его номер.")
+	errPleaseChooseSuggestedAnswer = errors.New("Пожалуйста, выберите один из предложенных вариантов ответа.")
 )
 
 func knownEvent(c *ViberCallback) bool {
