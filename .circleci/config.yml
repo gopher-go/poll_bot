@@ -51,7 +51,8 @@ jobs:
             fi
 
   send-approval-link:
-    executor: ubuntu-build
+    docker:
+      - image: circleci/golang:1.14
     steps:
       - slack/notify:
           channel: $SLACK_CHANNEL_ID
