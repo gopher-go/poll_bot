@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"time"
 
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -19,7 +20,8 @@ const initDbSQL = `CREATE TABLE users (
 	level INT NOT NULL,
 	properties JSON NOT NULL,
 	candidate TEXT NOT NULL,
-	context VARCHAR(254) NOT NULL 
+	context VARCHAR(254) NOT NULL,
+	created_at timestamp not null
 );`
 
 func newPersistenseStorageSqllite() (*persistenseStorage, error) {
@@ -107,8 +109,8 @@ func (s *persistenseStorage) save(user *storageUser) error {
 	}
 
 	if count == 0 {
-		sqlStatement = `INSERT INTO users (id, country, context, level, properties, candidate) VALUES ($1, $2, $3, $4, $5, $6)`
-		_, err = s.db.Exec(sqlStatement, user.ID, user.Country, user.Context, user.Level, string(properties), user.Candidate)
+		sqlStatement = `INSERT INTO users (id, country, context, level, properties, candidate, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+		_, err = s.db.Exec(sqlStatement, user.ID, user.Country, user.Context, user.Level, string(properties), user.Candidate, time.Now().UTC())
 		return err
 	}
 	sqlStatement = `UPDATE users SET country=$2, context=$3, level=$4, properties=$5, candidate=$6 WHERE id = $1`
