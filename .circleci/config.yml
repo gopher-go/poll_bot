@@ -82,7 +82,7 @@ jobs:
               sh ./deploy/create_env_file_stag.sh
               echo "Deploying app staging (Narodny opros)"
               sudo apt-get install google-cloud-sdk-app-engine-go
-              gcloud app deploy --project $GOOGLE_PROJECT_ID staging.yml -q
+              gcloud app deploy --project $GOOGLE_PROJECT_ID staging.yaml -q
             else echo "Not executing on a branch other than master"
             fi
 
