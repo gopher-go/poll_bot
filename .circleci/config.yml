@@ -115,7 +115,6 @@ workflows:
       - staging:
           context: Deployment
           requires:
-            - build
             - hold
 #      - prod:
 #          context: Deployment
