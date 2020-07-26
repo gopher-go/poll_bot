@@ -116,7 +116,7 @@ func keyboardFromOptions(v *viber.Viber, options []string) *viber.Keyboard {
 			ActionBody: opt,
 			Image:      "",
 			Text:       fmt.Sprintf(`<font color="#FFFFFF">%s</font>`, opt),
-			TextSize:   viber.Regular,
+			TextSize:   viber.Medium,
 			Frame: &viber.ButtonFrame{
 				CornerRadius: &cornerRadius,
 			},
