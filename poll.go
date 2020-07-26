@@ -78,7 +78,7 @@ func generateOurPoll() poll {
 
 	ret.add(&pollItem{
 		question: func(user *storageUser, c *ViberCallback) string {
-			return "К какому типу относится ваш населенный пункт?"
+			return "К какому типу относится населенный пункт, в котором вы проживаете?"
 		},
 		possibleAnswers: []string{
 			"Областной центр",
