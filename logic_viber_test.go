@@ -57,7 +57,7 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 	require.Equal(t, text.User.ID, userID)
 	reply, err = generateReplyFor(p, s, text)
 	require.NoError(t, err)
-	require.Equal(t, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВы гражданин Республики Беларусь?", reply.text)
 	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Да"))
@@ -95,12 +95,12 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВы гражданин Республики Беларусь?")
 	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "нету"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВы гражданин Республики Беларусь?")
 	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "ДА"))
@@ -183,7 +183,7 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВы гражданин Республики Беларусь?")
 	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Да"))
@@ -236,11 +236,11 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВыберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск", reply.text)
+	require.Equal(t, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВыберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск", reply.text)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВыберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск", reply.text)
+	require.Equal(t, "Пожалуйста, выберите один из предложенных вариантов ответа.\n\nВыберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск", reply.text)
 
 	subscribe := newSubscribeCallback(t, userID)
 	user, err = s.Obtain(userID)
