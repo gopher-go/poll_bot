@@ -49,7 +49,7 @@ func execute() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v := viber.New(viberKey, "Voting bot", "https://thumbs.dreamstime.com/z/human-hand-write-yes-vote-voting-paper-pen-flat-concept-illustration-man-s-red-pen-ballot-check-sign-88802664.jpg")
+	v := viber.New(viberKey, "Народный опрос", "https://thumbs.dreamstime.com/z/human-hand-write-yes-vote-voting-paper-pen-flat-concept-illustration-man-s-red-pen-ballot-check-sign-88802664.jpg")
 	go func() {
 		err := serve(v, ud)
 		if err != nil {
