@@ -121,7 +121,7 @@ func keyboardFromOptions(v *viber.Viber, options []string) *viber.Keyboard {
 			},
 			TextVAlign: "",
 			TextHAlign: "",
-			BgColor:    "#9482F8",
+			BgColor:    "#46407c",
 		}
 		ret.AddButton(b)
 	}
