@@ -101,8 +101,7 @@ const welcomeHeader = `Добро пожаловать в проект «Нар�
 Давайте вместе узнаем реальный предвыборный рейтинг всех кандидатов в президенты!
 Всё, что необходимо сделать, — пройти наш опрос. Он полностью анонимный.
 
-Нас уже %d человек! Присоединяйтесь!
-`
+Нас уже %d человек! Присоединяйтесь!`
 
 func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback) (*viberReply, error) {
 
@@ -127,7 +126,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		if err != nil {
 			return nil, err
 		}
-		welcome = fmt.Sprintf(welcomeHeader, totalCount+568)
+		welcome = fmt.Sprintf(welcomeHeader, totalCount+568) + "\n\n"
 	}
 
 	item := p.getLevel(u.Level)

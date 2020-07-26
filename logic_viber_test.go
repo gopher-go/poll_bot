@@ -19,7 +19,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	text := newTextCallback(t, userID, "Да")
@@ -34,7 +34,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 569)+"Укажите, пожалуйста, Ваш возраст", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 569)+"\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
 	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
 }
 
@@ -50,7 +50,7 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	text := newTextCallback(t, userID, "Привет")
@@ -91,7 +91,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?")
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
@@ -179,7 +179,7 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
