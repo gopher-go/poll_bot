@@ -97,8 +97,10 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 }
 
 const welcomeHeader = `Добро пожаловать в проект «Народный опрос»! 
+
 Давайте вместе узнаем реальный предвыборный рейтинг всех кандидатов в президенты!
 Всё, что необходимо сделать, — пройти наш опрос. Он полностью анонимный.
+
 Нас уже %d человек! Присоединяйтесь!
 `
 
@@ -111,9 +113,9 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		if err != nil {
 			return nil, err
 		}
-		text := "Спасибо, ваш голос учтен!"
+		text := "Спасибо за участие в нашем опросе!\nМы опубликуем результаты до 4 августа."
 		if isNewConversation {
-			text = "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!"
+			text = "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!\nМы опубликуем результаты до 4 августа."
 		}
 		text += fmt.Sprintf("\nНас уже %d человек!", totalCount+568)
 		return &viberReply{text: text}, nil
