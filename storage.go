@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"log"
-	"time"
 )
 
 type userDAO interface {
@@ -36,8 +35,6 @@ type storageUser struct {
 
 	Candidate string
 	Context   string
-
-	CreatedAt time.Time
 
 	isChanged bool
 }
