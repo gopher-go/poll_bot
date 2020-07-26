@@ -19,10 +19,10 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы гражданин Республики Беларусь?", reply.text)
-	require.Equal(t, []string{"1. Да", "2. Нет"}, reply.options)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
-	text := newTextCallback(t, userID, "1. Да")
+	text := newTextCallback(t, userID, "Да")
 	require.Equal(t, text.User.ID, userID)
 	reply, err = generateReplyFor(p, s, text)
 	require.NoError(t, err)
@@ -34,8 +34,8 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nУкажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"1. меньше 18", "2. 18-24", "3. 25-34", "4. 35-44", "5. 45-54", "6. 55+"}, reply.options)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 569)+"Укажите, пожалуйста, Ваш возраст", reply.text)
+	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
 }
 
 func TestUserFlowCaseSensitive(t *testing.T) {
@@ -50,20 +50,20 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы гражданин Республики Беларусь?", reply.text)
-	require.Equal(t, []string{"1. Да", "2. Нет"}, reply.options)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	text := newTextCallback(t, userID, "Привет")
 	require.Equal(t, text.User.ID, userID)
 	reply, err = generateReplyFor(p, s, text)
 	require.NoError(t, err)
 	require.Equal(t, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?", reply.text)
-	require.Equal(t, []string{"1. Да", "2. Нет"}, reply.options)
+	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Да"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Да"))
 	require.NoError(t, err)
 	require.Equal(t, "Укажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"1. меньше 18", "2. 18-24", "3. 25-34", "4. 35-44", "5. 45-54", "6. 55+"}, reply.options)
+	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
@@ -91,74 +91,72 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Добрый день!\nВы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?")
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
-	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "2. нету"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "нету"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
-	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. ДА"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "ДА"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш возраст")
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. меньше 18"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "младше 18"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Вам должно быть 18 или больше.\n\nУкажите, пожалуйста, Ваш возраст")
+	require.Equal(t, "Вам должно быть 18 или больше.\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 35-44"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "41-55"))
 	require.NoError(t, err)
-	require.Equal(t, "Примете ли Вы участие в предстоящих выборах Президента?", reply.text)
-	require.Equal(t, []string{"1. Да", "2. Нет", "3. Затрудняюсь ответить"}, reply.options)
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Да"))
+	require.Equal(t, "К какому типу относится ваш населенный пункт?", reply.text)
+	require.Equal(t, reply.options, []string{"Областной центр", "Город или городской поселок", "Агрогородок / Село / Деревня", "Проживаю за пределами РБ"})
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Агрогородок / село / Деревня"))
 	require.NoError(t, err)
+
 	require.Equal(t, "За кого Вы планируете проголосовать?", reply.text)
-	require.Equal(t, []string{"1. Дмитриев", "2. Канопацкая", "3. Лукашенко", "4. Тихановская", "5. Черечень", "6. Против всех", "7. Затрудняюсь ответить"}, reply.options)
+	require.Equal(t, []string{"Дмитриев", "Канопацкая", "Лукашенко", "Тихановская", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Дмитриев"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Дмитриев"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш пол")
-	require.Equal(t, reply.options, []string{"1. Мужской", "2. Женский"})
+	require.Equal(t, reply.options, []string{"Мужской", "Женский"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. мужской"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "мужской"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Выберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск")
-	require.Equal(t, reply.options, []string{"1. Брестская", "2. Витебская", "3. Гомельская", "4. Гродненская", "5. Минская", "6. Могилевская", "7. Минск", "8. Проживаю за пределами РБ"})
+	require.Equal(t, reply.options, []string{"Брестская", "Витебская", "Гомельская", "Гродненская", "Минская", "Могилевская", "Минск", "Проживаю за пределами РБ"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "2. витебская"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "витебская"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "К какому типу относится ваш населенный пункт? Если живете в Минске - выберите Минск.")
-	require.Equal(t, reply.options, []string{"1. Областной центр", "2. Город или городской поселок", "3. Агрогородок / Село / Деревня", "4. Проживаю за пределами РБ"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "3. Агрогородок / село / Деревня"))
 	require.NoError(t, err)
 	require.Equal(t, "Ваш уровень образования?", reply.text)
-	require.Equal(t, []string{"1. Базовое / Среднее общее (школа)", "2. Профессионально-техническое", "3. Среднее специальное", "4. Высшее", "5. Другое"}, reply.options)
+	require.Equal(t, []string{"Базовое / Среднее общее (школа)", "Профессионально-техническое", "Среднее специальное", "Высшее", "Другое"}, reply.options)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "3. Среднее специальное"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Среднее специальное"))
 	require.NoError(t, err)
-	require.Equal(t, "Укажите, пожалуйста, общий совокупный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)", reply.text)
-	require.Equal(t, reply.options, []string{"1. До 500 бел. руб.", "2. 500 - 1000 бел. руб.", "3. 1000 - 2000 бел. руб.", "4. Выше 2000 бел.руб.", "5. Не хочу отвечать на этот вопрос"})
+	require.Equal(t, "Укажите, пожалуйста, общий совокупный месячный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)", reply.text)
+	require.Equal(t, reply.options, []string{"До 500 бел. руб.", "500 - 1000 бел. руб.", "1000 - 2000 бел. руб.", "Выше 2000 бел.руб.", "Не хочу отвечать на этот вопрос"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. До 500 бел. руб."))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "До 500 бел. руб."))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!")
+	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!\nНас уже 569 человек!")
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
 	require.Equal(t, user.ID, userID)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
-	require.Equal(t, user.Level, 9)
-	require.Equal(t, user.Candidate, "1. Дмитриев")
+	require.Equal(t, user.Properties["age"], "41-55")
+	require.Equal(t, 8, user.Level)
+	require.Equal(t, user.Candidate, "Дмитриев")
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!")
+	require.Equal(t, reply.text, "Спасибо, ваш голос учтен!\nНас уже 569 человек!")
 
 	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userID))
 	require.NoError(t, err)
@@ -166,7 +164,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!", reply.text)
+	require.Equal(t, "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!\nНас уже 569 человек!", reply.text)
 }
 
 func TestUserFlow(t *testing.T) {
@@ -181,33 +179,33 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"Вы гражданин Республики Беларусь?", reply.text)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
-	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
+	require.Equal(t, reply.options, []string{"Да", "Нет"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Да"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Да"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш возраст")
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. меньше 18"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "младше 18"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Вам должно быть 18 или больше.\n\nУкажите, пожалуйста, Ваш возраст")
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4. 35-44"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "41-55"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Примете ли Вы участие в предстоящих выборах Президента?")
-	require.Equal(t, reply.options, []string{"1. Да", "2. Нет", "3. Затрудняюсь ответить"})
+
+	require.Equal(t, "К какому типу относится ваш населенный пункт?", reply.text)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
 
 	require.Equal(t, user.ID, userID)
 	fmt.Println(user)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
-	require.Equal(t, user.Level, 2)
+	require.Equal(t, user.Properties["age"], "41-55")
+	require.Equal(t, 2, user.Level)
 
 	seenCallback := newSeenCallback(t, userID)
 	require.Equal(t, seenCallback.User.ID, userID)
@@ -215,26 +213,26 @@ func TestUserFlow(t *testing.T) {
 	require.NoError(t, err)
 	require.Nil(t, reply)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Да"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Агрогородок / Село / Деревня"))
 	require.NoError(t, err)
 	require.Equal(t, "За кого Вы планируете проголосовать?", reply.text)
-	require.Equal(t, []string{"1. Дмитриев", "2. Канопацкая", "3. Лукашенко", "4. Тихановская", "5. Черечень", "6. Против всех", "7. Затрудняюсь ответить"}, reply.options)
+	require.Equal(t, []string{"Дмитриев", "Канопацкая", "Лукашенко", "Тихановская", "Черечень", "Против всех", "Затрудняюсь ответить", "Не пойду голосовать"}, reply.options)
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "3. Лукашенко"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Лукашенко"))
 	require.NoError(t, err)
 	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш пол")
-	require.Equal(t, reply.options, []string{"1. Мужской", "2. Женский"})
+	require.Equal(t, reply.options, []string{"Мужской", "Женский"})
 
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "1. Мужской"))
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Мужской"))
 	require.NoError(t, err)
 
 	user, err = s.fromPersisted(userID)
 	require.NoError(t, err)
 
 	require.Equal(t, user.ID, userID)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
+	require.Equal(t, user.Properties["age"], "41-55")
 	require.Equal(t, 5, user.Level)
-	require.Equal(t, "3. Лукашенко", user.Candidate)
+	require.Equal(t, "Лукашенко", user.Candidate)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
@@ -254,41 +252,6 @@ func TestUserFlow(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newSeenCallback(t, userID))
 	require.NoError(t, err)
 	require.Empty(t, reply)
-}
-
-func TestNumericReplies(t *testing.T) {
-	s, err := newTestStorage()
-	require.NoError(t, err)
-	err = s.init()
-	require.NoError(t, err)
-
-	p := generateOurPoll()
-
-	userID := "123"
-
-	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
-	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы гражданин Республики Беларусь?", reply.text)
-
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
-	require.NoError(t, err)
-	require.Equal(t, reply.text, "Пожалуйста выберите один из предложенных ответов или введите его номер.\n\nВы гражданин Республики Беларусь?")
-	require.Equal(t, reply.options, []string{"1. Да", "2. Нет"})
-
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "2"))
-	require.NoError(t, err)
-	require.Equal(t, reply.text, "Укажите, пожалуйста, Ваш возраст")
-
-	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "4"))
-	require.NoError(t, err)
-	require.Equal(t, "Примете ли Вы участие в предстоящих выборах Президента?", reply.text)
-
-	user, err := s.fromPersisted(userID)
-	require.NoError(t, err)
-
-	require.Equal(t, user.ID, userID)
-	require.Equal(t, 2, user.Level)
-	require.Equal(t, user.Properties["age"], "4. 35-44")
 }
 
 func newUnsubscribeCallback(t *testing.T, id string) *ViberCallback {
