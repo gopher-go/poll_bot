@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -97,11 +96,15 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 	return nil, nil
 }
 
+const welcomeHeader = `Добро пожаловать в проект «Народный опрос»! 
+Давайте вместе узнаем реальный предвыборный рейтинг всех кандидатов в президенты!
+Всё, что необходимо сделать, — пройти наш опрос. Он полностью анонимный.
+Нас уже %d человек! Присоединяйтесь!
+`
+
 func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback) (*viberReply, error) {
-	var welcome string
-	if u.Properties["ConversationStarted"] != "true" {
-		welcome = "Добрый день!\n"
-	}
+
+	var isNewConversation = u.Properties["ConversationStarted"] != "true"
 
 	if p.isFinishedFor(u) {
 		totalCount, err := s.PersistCount()
@@ -109,13 +112,20 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 			return nil, err
 		}
 		text := "Спасибо, ваш голос учтен!"
-		if welcome != "" {
-			text = welcome + "Вы уже приняли участие в Народном опросе. " + text
+		if isNewConversation {
+			text = "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!"
 		}
-		if totalCount > 500 {
-			text += fmt.Sprintf("\nНас уже %d человек!", totalCount)
-		}
+		text += fmt.Sprintf("\nНас уже %d человек!", totalCount+568)
 		return &viberReply{text: text}, nil
+	}
+
+	var welcome string
+	if isNewConversation {
+		totalCount, err := s.PersistCount()
+		if err != nil {
+			return nil, err
+		}
+		welcome = fmt.Sprintf(welcomeHeader, totalCount+568)
 	}
 
 	item := p.getLevel(u.Level)
@@ -124,6 +134,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		reply.text = welcome + item.question(u, c)
 		reply.options = item.possibleAnswers
 	}
+
 	return &reply, nil
 }
 
@@ -135,36 +146,24 @@ func analyseAnswer(p poll, u *storageUser, c *ViberCallback) error {
 
 	answer := c.Message.Text
 	normalAnswer := answer
+	if !caseSensitive {
+		found := false
+		answer = strings.ToLower(answer)
 
-	found := false
-	// handle numeric reply
-	if n, err := strconv.Atoi(answer); err == nil {
-		if n > len(item.possibleAnswers) || n < 1 {
+		// handle click reply
+		for _, v := range item.possibleAnswers {
+			if answer == strings.ToLower(v) {
+				normalAnswer = v
+				found = true
+				break
+			}
+		}
+
+		if !found {
 			return errPleaseChooseSuggestedAnswer
 		}
-		normalAnswer = item.possibleAnswers[n-1]
-		found = true
-	}
-
-	if !found {
-		if !caseSensitive {
-			answer = strings.ToLower(answer)
-
-			// handle click reply
-			for _, v := range item.possibleAnswers {
-				if answer == strings.ToLower(v) {
-					normalAnswer = v
-					found = true
-					break
-				}
-			}
-
-			if !found {
-				return errPleaseChooseSuggestedAnswer
-			}
-		} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
-			return errPleaseChooseSuggestedAnswer
-		}
+	} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
+		return errPleaseChooseSuggestedAnswer
 	}
 
 	if item.validateAnswer != nil {
