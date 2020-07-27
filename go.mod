@@ -8,6 +8,7 @@ require (
 	github.com/andrewkav/viber v1.0.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/googleapis/google-cloud-go-testing v0.0.0-20191008195207-8e1d251e947d
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.7.1
 	github.com/mattn/go-sqlite3 v1.14.0
@@ -20,6 +21,7 @@ require (
 	golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c // indirect
 	golang.org/x/tools v0.0.0-20200721032237-77f530d86f9a // indirect
 	google.golang.org/api v0.29.0
+	google.golang.org/appengine v1.6.6
 	google.golang.org/genproto v0.0.0-20200721032028-5044d0edf986 // indirect
 	google.golang.org/grpc v1.30.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect

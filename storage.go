@@ -43,7 +43,7 @@ type storageUser struct {
 	ID         string            `datastore:"id"`
 	Country    string            `datastore:"country"`
 	Level      int               `datastore:"level,noindex"`
-	Properties map[string]string `datastore:"properties,noindex"`
+	Properties map[string]string `datastore:"-"`
 	Candidate  string            `datastore:"candidate"`
 	Context    string            `datastore:"context"`
 	CreatedAt  time.Time         `datastore:"created_at"`
