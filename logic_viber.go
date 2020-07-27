@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 var (
@@ -34,24 +35,30 @@ type viberReply struct {
 	options []string
 }
 
-func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*viberReply, error) {
+func logUserAnswer(s *storage, al answerLog) {
+	go func() {
+		_ = s.LogAnswer(al)
+	}()
+}
+
+func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberReply, error) {
 	if !knownEvent(callback) {
 		return nil, fmt.Errorf("Unknown message %v", callback.Event)
 	}
 
 	if strings.ToLower(callback.Message.Text) == "i'm a tester, clear it" {
-		err := storage.Clear(callback.User.ID)
+		err := s.Clear(callback.User.ID)
 		return &viberReply{text: fmt.Sprintf("Your storage cleared with %v", err)}, nil
 	}
 
-	storageUser, err := storage.Obtain(callback.User.ID)
+	storageUser, err := s.Obtain(callback.User.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
 		if storageUser.isChanged {
-			_ = storage.Persist(storageUser)
+			_ = s.Persist(storageUser)
 		}
 	}()
 
@@ -72,19 +79,43 @@ func generateReplyFor(poll poll, storage *storage, callback *ViberCallback) (*vi
 	}
 
 	if callback.Event == "message" {
-		err := analyseAnswer(poll, storageUser, callback)
+		pi := poll.getLevel(storageUser.Level)
+
+		al := answerLog{
+			UserID:      storageUser.ID,
+			UserContext: storageUser.Context,
+			QuestionID:  pi.id,
+			Answer:      callback.Message.Text,
+			AnswerLevel: pi.level,
+			IsValid:     true,
+			CreatedAt:   time.Now().UTC(),
+		}
+
+		err := analyseAnswer(pi, storageUser, callback)
 		if err != nil {
-			reply, _ := getViberReplyForLevel(poll, storage, storageUser, callback)
-			reply.text = err.Error() + "\n\n" + reply.text
+			reply, _ := getViberReplyForLevel(poll, s, storageUser, callback)
+
+			// if finished don't generate error
+			if !poll.isFinishedFor(storageUser) {
+				reply.text = err.Error() + "\n\n" + reply.text
+			}
+
+			al.IsValid = false
+			logUserAnswer(s, al)
+
 			return reply, nil
 		}
+
 		storageUser.Level++
 		storageUser.isChanged = true
-		return getViberReplyForLevel(poll, storage, storageUser, callback)
+
+		logUserAnswer(s, al)
+
+		return getViberReplyForLevel(poll, s, storageUser, callback)
 	}
 
 	if storageUser.Properties["ConversationStarted"] != "true" {
-		reply, err := getViberReplyForLevel(poll, storage, storageUser, callback)
+		reply, err := getViberReplyForLevel(poll, s, storageUser, callback)
 		if err != nil {
 			return nil, err
 		}
@@ -130,21 +161,14 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 	}
 
 	item := p.getLevel(u.Level)
-	reply := viberReply{text: fmt.Sprintf("Непонятно. Нет уровня %v в вопросах", u.Level)}
-	if item != nil {
-		reply.text = welcome + item.question(u, c)
-		reply.options = item.possibleAnswers
-	}
 
-	return &reply, nil
+	return &viberReply{
+		text:    welcome + item.question(u, c),
+		options: item.possibleAnswers,
+	}, nil
 }
 
-func analyseAnswer(p poll, u *storageUser, c *ViberCallback) error {
-	item := p.getLevel(u.Level)
-	if item == nil {
-		return nil
-	}
-
+func analyseAnswer(pi pollItem, u *storageUser, c *ViberCallback) error {
 	answer := c.Message.Text
 	normalAnswer := answer
 	if !caseSensitive {
@@ -152,7 +176,7 @@ func analyseAnswer(p poll, u *storageUser, c *ViberCallback) error {
 		answer = strings.ToLower(answer)
 
 		// handle click reply
-		for _, v := range item.possibleAnswers {
+		for _, v := range pi.possibleAnswers {
 			if answer == strings.ToLower(v) {
 				normalAnswer = v
 				found = true
@@ -163,18 +187,18 @@ func analyseAnswer(p poll, u *storageUser, c *ViberCallback) error {
 		if !found {
 			return errPleaseChooseSuggestedAnswer
 		}
-	} else if item.possibleAnswers != nil && !contains(item.possibleAnswers, answer) {
+	} else if pi.possibleAnswers != nil && !contains(pi.possibleAnswers, answer) {
 		return errPleaseChooseSuggestedAnswer
 	}
 
-	if item.validateAnswer != nil {
-		err := item.validateAnswer(normalAnswer)
+	if pi.validateAnswer != nil {
+		err := pi.validateAnswer(normalAnswer)
 		if err != nil {
 			return err
 		}
 	}
-	if item.persistAnswer != nil {
-		err := item.persistAnswer(normalAnswer, u)
+	if pi.persistAnswer != nil {
+		err := pi.persistAnswer(normalAnswer, u)
 		if err != nil {
 			return err
 		}

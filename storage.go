@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"time"
 )
 
 type userDAO interface {
@@ -12,29 +13,40 @@ type userDAO interface {
 	save(user *storageUser) error
 }
 
-type storage struct {
-	//users      sync.Map
-	userDAO userDAO
+type answerLog struct {
+	UserID      string    `datastore:"user_id"`
+	UserContext string    `datastore:"user_context"`
+	QuestionID  string    `datastore:"question_id,noindex"`
+	Answer      string    `datastore:"answer,noindex"`
+	AnswerLevel int       `datastore:"answer_level,noindex"`
+	IsValid     bool      `datastore:"is_valid"`
+	CreatedAt   time.Time `datastore:"created_at"`
 }
 
-func newStorage(ud userDAO) (*storage, error) {
+type logDAO interface {
+	save(al answerLog) error
+}
 
+type storage struct {
+	userDAO userDAO
+	logDAO  logDAO
+}
+
+func newStorage(ud userDAO, ld logDAO) (*storage, error) {
 	return &storage{
-		//users:      sync.Map{},
+		logDAO:  ld,
 		userDAO: ud,
 	}, nil
 }
 
 type storageUser struct {
-	ID      string
-	Country string
-
-	Level int
-
-	Properties map[string]string
-
-	Candidate string
-	Context   string
+	ID         string            `datastore:"id"`
+	Country    string            `datastore:"country"`
+	Level      int               `datastore:"level,noindex"`
+	Properties map[string]string `datastore:"properties,noindex"`
+	Candidate  string            `datastore:"candidate"`
+	Context    string            `datastore:"context"`
+	CreatedAt  time.Time         `datastore:"created_at"`
 
 	isChanged bool
 }
@@ -46,16 +58,18 @@ func (u *storageUser) validate() error {
 	return nil
 }
 
+func (s *storage) LogAnswer(al answerLog) error {
+	if s.logDAO != nil {
+		return s.logDAO.save(al)
+	}
+	return nil
+}
+
 func (s *storage) Obtain(id string) (*storageUser, error) {
 	if id == "" {
 		return nil, errors.New("Unable to obtain empty id")
 	}
 
-	//user := s.fromCache(id)
-	//if user != nil {
-	//	user.isChanged = false
-	//	return user, user.validate()
-	//}
 	persistedUser, err := s.fromPersisted(id)
 	if err != nil {
 		return nil, err
@@ -69,20 +83,11 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 		ID:         id,
 		Properties: map[string]string{},
 	}
-	//s.users.Store(id, newUser)
+
 	newUser.isChanged = false
 
 	return newUser, newUser.validate()
 }
-
-// internal
-//func (s *Storage) fromCache(id string) *StorageUser {
-//	user, ok := s.users.Load(id)
-//	if ok && user != nil {
-//		return user.(*StorageUser)
-//	}
-//	return nil
-//}
 
 // internal
 func (s *storage) fromPersisted(id string) (*storageUser, error) {
@@ -130,11 +135,6 @@ func (s *storage) Persist(user *storageUser) error {
 	if s.userDAO == nil {
 		return errors.New("persistence not enabled")
 	}
-
-	//user := s.fromCache(id)
-	//if user == nil {
-	//	return fmt.Errorf("%v missed in cache", id)
-	//}
 
 	err := s.userDAO.save(user)
 	if err != nil {
