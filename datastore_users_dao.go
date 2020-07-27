@@ -27,6 +27,10 @@ func getInt(i interface{}) int {
 		return 0
 	}
 
+	if !iv.IsValid() {
+		return 0
+	}
+
 	return int(iv.Int())
 }
 
