@@ -39,7 +39,7 @@ type viberReply struct {
 func logUserAnswer(s *storage, al answerLog) {
 	go func() {
 		if err := s.LogAnswer(al); err != nil {
-			log.Printf("unable to log user answer, err=%v", err)
+			log.Printf("unable to log user answer, err=%v\n", err)
 		}
 	}()
 }

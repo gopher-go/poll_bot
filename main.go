@@ -63,6 +63,7 @@ func execute() error {
 
 	var ud userDAO
 	if os.Getenv("DATASTORE_USERS_TABLE") != "" {
+		log.Printf("creating datatore user dao, entity kind = %s\n", os.Getenv("DATASTORE_USERS_TABLE"))
 		ud = newDatastoreUserDAO(mustGetDatastoreClient(), os.Getenv("DATASTORE_USERS_TABLE"))
 	} else {
 		ud, err = newPQUserDAO(os.Getenv("DB_CONNECTION"))
@@ -73,6 +74,7 @@ func execute() error {
 
 	var ld logDAO
 	if os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE") != "" {
+		log.Printf("creating datastore log answer dao, entity kind = %s\n", os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
 		ld = newDatastoreLogDAO(mustGetDatastoreClient(), os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
 	}
 
