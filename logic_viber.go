@@ -36,7 +36,7 @@ type viberReply struct {
 	options []string
 }
 
-func logUserAnswer(s *storage, al answerLog) {
+func logUserAnswer(s *storage, al *answerLog) {
 	go func() {
 		if err := s.LogAnswer(al); err != nil {
 			log.Printf("unable to log user answer, err=%v\n", err)
@@ -104,7 +104,7 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 			}
 
 			al.IsValid = false
-			logUserAnswer(s, al)
+			logUserAnswer(s, &al)
 
 			return reply, nil
 		}
@@ -112,7 +112,7 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 		storageUser.Level++
 		storageUser.isChanged = true
 
-		logUserAnswer(s, al)
+		logUserAnswer(s, &al)
 
 		return getViberReplyForLevel(poll, s, storageUser, callback)
 	}

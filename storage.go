@@ -24,7 +24,7 @@ type answerLog struct {
 }
 
 type logDAO interface {
-	save(al answerLog) error
+	save(al *answerLog) error
 }
 
 type storage struct {
@@ -58,7 +58,7 @@ func (u *storageUser) validate() error {
 	return nil
 }
 
-func (s *storage) LogAnswer(al answerLog) error {
+func (s *storage) LogAnswer(al *answerLog) error {
 	if s.logDAO != nil {
 		return s.logDAO.save(al)
 	}
