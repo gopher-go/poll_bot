@@ -1,5 +1,5 @@
 runtime: go114
 service: default
 automatic_scaling:
-  min_num_instances: 1
-  max_num_instances: 3
+  min_instances: 1
+  max_instances: 3
