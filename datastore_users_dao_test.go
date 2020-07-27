@@ -20,11 +20,11 @@ func _TestDatastoreUserDAO_Save(t *testing.T) {
 		entityKind: "user",
 	}
 
-	err = ds.save(&storageUser{ID: "test", Properties: map[string]string{"test": "test"}})
+	err = ds.save(&storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1})
 	require.NoError(t, err)
 
 	su, err := ds.load("test")
 	require.NoError(t, err)
 	su.CreatedAt = time.Time{}
-	require.Equal(t, &storageUser{ID: "test", Properties: map[string]string{"test": "test"}}, su)
+	require.Equal(t, &storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1}, su)
 }
