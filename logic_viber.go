@@ -69,6 +69,18 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 		storageUser.Country = callback.User.Country
 		storageUser.isChanged = true
 	}
+	if storageUser.Language != callback.User.Language {
+		storageUser.Language = callback.User.Language
+		storageUser.isChanged = true
+	}
+	if storageUser.MobileNetworkCode != callback.User.MNC {
+		storageUser.MobileNetworkCode = callback.User.MNC
+		storageUser.isChanged = true
+	}
+	if storageUser.MobileCountryCode != callback.User.MCC {
+		storageUser.MobileCountryCode = callback.User.MCC
+		storageUser.isChanged = true
+	}
 
 	if callback.Event == "unsubscribed" {
 		storageUser.Properties["ConversationStarted"] = "false"
