@@ -19,11 +19,11 @@ func newDatastoreLogDAO(c *datastore.Client, entityKind string) *datastoreLogDAO
 	}
 }
 
-func datastoreAnswerLogRowKey(al answerLog) string {
+func datastoreAnswerLogRowKey(al *answerLog) string {
 	return al.UserID + "#" + al.UserContext + "#" + strconv.FormatInt(al.CreatedAt.UnixNano(), 16)
 }
 
-func (d datastoreLogDAO) save(al answerLog) error {
+func (d datastoreLogDAO) save(al *answerLog) error {
 	_, err := d.Put(context.Background(), datastore.NameKey(d.entityKind, datastoreAnswerLogRowKey(al), nil), al)
 	return err
 }
