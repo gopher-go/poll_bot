@@ -31,6 +31,9 @@ func (u *storageUser) Load(properties []datastore.Property) error {
 	u.Candidate = propMap["candidate"].Value.(string)
 	u.Context = propMap["context"].Value.(string)
 	u.Level = int(propMap["level"].Value.(int64))
+	u.MobileCountryCode = int(propMap["mcc"].Value.(int64))
+	u.MobileNetworkCode = int(propMap["mnc"].Value.(int64))
+	u.Language = propMap["language"].Value.(string)
 	u.CreatedAt = propMap["created_at"].Value.(time.Time)
 
 	u.Properties = map[string]string{}
@@ -52,6 +55,9 @@ func (u *storageUser) Save() ([]datastore.Property, error) {
 	props = append(props, datastore.Property{Name: "level", Value: u.Level, NoIndex: true})
 	props = append(props, datastore.Property{Name: "candidate", Value: u.Candidate})
 	props = append(props, datastore.Property{Name: "country", Value: u.Country})
+	props = append(props, datastore.Property{Name: "language", Value: u.Language, NoIndex: true})
+	props = append(props, datastore.Property{Name: "mcc", Value: u.MobileCountryCode, NoIndex: true})
+	props = append(props, datastore.Property{Name: "mnc", Value: u.MobileNetworkCode, NoIndex: true})
 
 	for pn, p := range u.Properties {
 		props = append(props, datastore.Property{Name: "property." + pn, Value: p, NoIndex: true})

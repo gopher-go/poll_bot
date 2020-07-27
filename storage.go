@@ -40,13 +40,16 @@ func newStorage(ud userDAO, ld logDAO) (*storage, error) {
 }
 
 type storageUser struct {
-	ID         string
-	Country    string
-	Level      int
-	Properties map[string]string
-	Candidate  string
-	Context    string
-	CreatedAt  time.Time
+	ID                string
+	Country           string
+	Language          string
+	MobileCountryCode int
+	MobileNetworkCode int
+	Level             int
+	Properties        map[string]string
+	Candidate         string
+	Context           string
+	CreatedAt         time.Time
 
 	isChanged bool
 }
