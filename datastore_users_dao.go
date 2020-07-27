@@ -63,6 +63,9 @@ func (u *storageUser) Save() ([]datastore.Property, error) {
 func (d datastoreUserDAO) load(id string) (*storageUser, error) {
 	var u storageUser
 	if err := d.Get(context.Background(), datastore.NameKey(d.entityKind, id, nil), &u); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			return nil, nil
+		}
 		return nil, err
 	}
 
