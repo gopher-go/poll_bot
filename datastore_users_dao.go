@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"reflect"
 	"strings"
 	"time"
 
@@ -20,6 +21,15 @@ type datastoreUserDAO struct {
 	entityKind string
 }
 
+func getInt(i interface{}) int {
+	iv := reflect.ValueOf(i)
+	if iv.Kind() == reflect.Interface && iv.IsNil() {
+		return 0
+	}
+
+	return int(iv.Int())
+}
+
 func (u *storageUser) Load(properties []datastore.Property) error {
 	propMap := map[string]datastore.Property{}
 	for i := range properties {
@@ -30,9 +40,9 @@ func (u *storageUser) Load(properties []datastore.Property) error {
 	u.Country = propMap["country"].Value.(string)
 	u.Candidate = propMap["candidate"].Value.(string)
 	u.Context = propMap["context"].Value.(string)
-	u.Level = int(propMap["level"].Value.(int64))
-	u.MobileCountryCode = int(propMap["mcc"].Value.(int64))
-	u.MobileNetworkCode = int(propMap["mnc"].Value.(int64))
+	u.Level = getInt(propMap["level"].Value)
+	u.MobileCountryCode = getInt(propMap["mcc"].Value)
+	u.MobileNetworkCode = getInt(propMap["mnc"].Value)
 	u.Language = propMap["language"].Value.(string)
 	u.CreatedAt = propMap["created_at"].Value.(time.Time)
 

@@ -19,7 +19,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 0)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	text := newTextCallback(t, userID, "Да")
@@ -34,7 +34,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 569)+"\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 1)+"\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
 	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
 }
 
@@ -50,7 +50,7 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 0)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 	require.Equal(t, []string{"Да", "Нет"}, reply.options)
 
 	text := newTextCallback(t, userID, "Привет")
@@ -91,7 +91,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?")
+	require.Equal(t, reply.text, fmt.Sprintf(welcomeHeader, 0)+"\n\nВы гражданин Республики Беларусь?")
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestCaseInsensitive(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "41-55"))
 	require.NoError(t, err)
 	require.Equal(t, "К какому типу относится населенный пункт, в котором вы проживаете?", reply.text)
-	require.Equal(t, reply.options, []string{"Областной центр", "Город или городской поселок", "Агрогородок / Село / Деревня", "Проживаю за пределами РБ"})
+	require.Equal(t, reply.options, []string{"Областной центр / Минск", "Город или городской поселок", "Агрогородок / Село / Деревня", "Проживаю за пределами РБ"})
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Агрогородок / село / Деревня"))
 	require.NoError(t, err)
 
@@ -145,7 +145,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "До 500 бел. руб."))
 	require.NoError(t, err)
-	require.Equal(t, "Спасибо за участие в нашем опросе!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!", reply.text)
+	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
@@ -156,7 +156,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, reply.text, "Спасибо за участие в нашем опросе!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!")
+	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
 
 	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userID))
 	require.NoError(t, err)
@@ -164,7 +164,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nВы уже приняли участие в Народном опросе. Спасибо, ваш голос учтен!\nМы опубликуем результаты до 4 августа.\nНас уже 569 человек!", reply.text)
+	require.Equal(t, "Добрый день!\nСпасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
 }
 
 func TestUserFlow(t *testing.T) {
@@ -179,7 +179,7 @@ func TestUserFlow(t *testing.T) {
 
 	reply, err := generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(welcomeHeader, 568)+"\n\nВы гражданин Республики Беларусь?", reply.text)
+	require.Equal(t, fmt.Sprintf(welcomeHeader, 0)+"\n\nВы гражданин Республики Беларусь?", reply.text)
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Привет"))
 	require.NoError(t, err)
