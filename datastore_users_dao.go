@@ -3,6 +3,7 @@ package main
 import (
 	"cloud.google.com/go/datastore"
 	"context"
+	"time"
 )
 
 type datastoreUserDAO struct {
@@ -28,6 +29,7 @@ func (d datastoreUserDAO) count() (int, error) {
 }
 
 func (d datastoreUserDAO) save(user *storageUser) error {
+	user.CreatedAt = time.Now().UTC()
 	_, err := d.Put(context.Background(), datastore.NameKey(d.entityKind, user.ID, nil), user)
 	return err
 }
