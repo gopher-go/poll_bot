@@ -23,9 +23,6 @@ type datastoreUserDAO struct {
 
 func getInt(i interface{}) int {
 	iv := reflect.ValueOf(i)
-	if iv.Kind() == reflect.Interface && iv.IsNil() {
-		return 0
-	}
 
 	if !iv.IsValid() {
 		return 0
@@ -34,26 +31,35 @@ func getInt(i interface{}) int {
 	return int(iv.Int())
 }
 
+func getString(i interface{}) string {
+	iv := reflect.ValueOf(i)
+	if !iv.IsValid() {
+		return ""
+	}
+
+	return iv.String()
+}
+
 func (u *storageUser) Load(properties []datastore.Property) error {
 	propMap := map[string]datastore.Property{}
 	for i := range properties {
 		propMap[properties[i].Name] = properties[i]
 	}
 
-	u.ID = propMap["id"].Value.(string)
-	u.Country = propMap["country"].Value.(string)
-	u.Candidate = propMap["candidate"].Value.(string)
-	u.Context = propMap["context"].Value.(string)
+	u.ID = getString(propMap["id"].Value)
+	u.Country = getString(propMap["country"].Value)
+	u.Candidate = getString(propMap["candidate"].Value)
+	u.Context = getString(propMap["context"].Value)
 	u.Level = getInt(propMap["level"].Value)
 	u.MobileCountryCode = getInt(propMap["mcc"].Value)
 	u.MobileNetworkCode = getInt(propMap["mnc"].Value)
-	u.Language = propMap["language"].Value.(string)
+	u.Language = getString(propMap["language"].Value)
 	u.CreatedAt = propMap["created_at"].Value.(time.Time)
 
 	u.Properties = map[string]string{}
 	for i := range properties {
 		if strings.HasPrefix(properties[i].Name, "property.") {
-			u.Properties[properties[i].Name[9:]] = properties[i].Value.(string)
+			u.Properties[properties[i].Name[9:]] = getString(properties[i].Value)
 		}
 	}
 
