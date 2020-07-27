@@ -35,8 +35,7 @@ func setViberWebhook(v *viber.Viber, url string) error {
 		return err
 	}
 
-	return err
-
+	return nil
 }
 
 func mustGetDatastoreClient() *datastore.Client {

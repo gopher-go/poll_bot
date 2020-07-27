@@ -23,6 +23,10 @@ func serve(v *viber.Viber, ud userDAO, ld logDAO) error {
 		handleMain(p, v, s, w, r)
 	})
 
+	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		handleStats(p, v, s, w, r)
+	})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
