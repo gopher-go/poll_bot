@@ -61,11 +61,11 @@ func generateOurPoll() poll {
 		},
 		possibleAnswers: []string{
 			"младше 18",
-			"18-25",
-			"26-40",
-			"41-55",
-			"55-70",
-			"старше 70",
+			"18-30",
+			"31-40",
+			"41-50",
+			"51-60",
+			"старше 60",
 		},
 		validateAnswer: func(answer string) error {
 			if answer == "младше 18" {
@@ -191,6 +191,22 @@ func generateOurPoll() poll {
 			return nil
 		},
 	})
+
+    ret.add(pollItem{
+        id: "vote_day",
+        question: func(user *storageUser, c *ViberCallback) string {
+            return "Когда вы планируете голосовать?"
+        },
+        possibleAnswers: []string{
+            "Досрочно (4-8 августа)",
+            "В день выборов (9 августа)",
+        },
+        persistAnswer: func(answer string, u *storageUser) error {
+            u.Properties["vote_day"] = answer
+            u.isChanged = true
+            return nil
+        },
+    })
 
 	return ret
 }
