@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func _TestDatastoreUserDAO_Save(t *testing.T) {
+func _TestDatastoreUserDAOSave(t *testing.T) {
 	os.Setenv("DATASTORE_EMULATOR_HOST", "localhost:8081")
 	c, err := datastore.NewClient(context.Background(), "test")
 	require.NoError(t, err)
