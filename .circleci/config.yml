@@ -25,6 +25,13 @@ jobs:
             go vet ./...
             go test ./...
 
+      # Run linter
+      - run:
+          name: Run linter
+          command: |
+            go get -u github.com/mgechev/revive
+            revive -config revive.toml
+
   dev:
     docker:
       - image: circleci/golang:1.14

@@ -7,7 +7,7 @@ import (
 type pollItem struct {
 	id              string
 	level           int
-	question        func(user *storageUser, c *ViberCallback) string
+	question        func(*storageUser, *ViberCallback) string
 	possibleAnswers []string
 	validateAnswer  func(string) error
 	persistAnswer   func(string, *storageUser) error
@@ -39,7 +39,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "isBelarus",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Вы гражданин Республики Беларусь?"
 		},
 
@@ -56,7 +56,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "age",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Укажите, пожалуйста, Ваш возраст"
 		},
 		possibleAnswers: []string{
@@ -82,7 +82,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "residence_location_type",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "К какому типу относится населенный пункт, в котором вы проживаете?"
 		},
 		possibleAnswers: []string{
@@ -100,7 +100,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "candidate",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "За кого Вы планируете проголосовать?"
 		},
 		possibleAnswers: []string{
@@ -118,7 +118,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "gender",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Укажите, пожалуйста, Ваш пол"
 		},
 		possibleAnswers: []string{
@@ -134,7 +134,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "residence_location",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Выберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск"
 		},
 		possibleAnswers: []string{
@@ -156,7 +156,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "education_level",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Ваш уровень образования?"
 		},
 		possibleAnswers: []string{
@@ -175,7 +175,7 @@ func generateOurPoll() poll {
 
 	ret.add(pollItem{
 		id: "income_total",
-		question: func(user *storageUser, c *ViberCallback) string {
+		question: func(_ *storageUser, _ *ViberCallback) string {
 			return "Укажите, пожалуйста, общий совокупный месячный доход вашей семьи (включая пенсии, стипендии, надбавки и прочее)"
 		},
 		possibleAnswers: []string{
@@ -194,7 +194,7 @@ func generateOurPoll() poll {
 
     ret.add(pollItem{
         id: "vote_day",
-        question: func(user *storageUser, c *ViberCallback) string {
+        question: func(_ *storageUser, _ *ViberCallback) string {
             return "Когда вы планируете голосовать?"
         },
         possibleAnswers: []string{
