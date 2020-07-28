@@ -35,7 +35,7 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(welcomeHeader, 1)+"\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
+	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "55-70", "старше 70"}, reply.options)
 }
 
 func TestUserFlowCaseSensitive(t *testing.T) {
@@ -63,7 +63,7 @@ func TestUserFlowCaseSensitive(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Да"))
 	require.NoError(t, err)
 	require.Equal(t, "Укажите, пожалуйста, Ваш возраст", reply.text)
-	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "старше 55"}, reply.options)
+	require.Equal(t, []string{"младше 18", "18-25", "26-40", "41-55", "55-70", "старше 70"}, reply.options)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)

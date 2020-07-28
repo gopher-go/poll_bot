@@ -64,7 +64,8 @@ func generateOurPoll() poll {
 			"18-25",
 			"26-40",
 			"41-55",
-			"старше 55",
+			"55-70",
+			"старше 70",
 		},
 		validateAnswer: func(answer string) error {
 			if answer == "младше 18" {
