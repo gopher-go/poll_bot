@@ -146,11 +146,11 @@ func TestCaseInsensitive(t *testing.T) {
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "До 500 бел. руб."))
 	require.NoError(t, err)
 	require.Equal(t, "Когда вы планируете голосовать?", reply.text)
-    require.Equal(t, reply.options, []string{ "Досрочно (4-8 августа)", "В день выборов (9 августа)"})
+	require.Equal(t, reply.options, []string{"Досрочно (4-8 августа)", "В день выборов (9 августа)"})
 
-    reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "В день выборов (9 августа)"))
-    require.NoError(t, err)
-	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
+	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "В день выборов (9 августа)"))
+	require.NoError(t, err)
+	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте "+URL+"\nНас уже 1 человек!", reply.text)
 
 	user, err := s.fromPersisted(userID)
 	require.NoError(t, err)
@@ -161,7 +161,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "Передумал"))
 	require.NoError(t, err)
-	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
+	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте "+URL+"\nНас уже 1 человек!", reply.text)
 
 	reply, err = generateReplyFor(p, s, newUnsubscribeCallback(t, userID))
 	require.NoError(t, err)
@@ -169,7 +169,7 @@ func TestCaseInsensitive(t *testing.T) {
 
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
-	require.Equal(t, "Добрый день!\nСпасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org\nНас уже 1 человек!", reply.text)
+	require.Equal(t, "Добрый день!\nСпасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте "+URL+"\nНас уже 1 человек!", reply.text)
 }
 
 func TestUserFlow(t *testing.T) {
