@@ -142,6 +142,7 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 	return nil, nil
 }
 
+const URL = "narodny-opros.info"
 const welcomeHeader = `Добро пожаловать в проект «Народный опрос»! 
 
 Давайте вместе узнаем реальный предвыборный рейтинг всех кандидатов в президенты!
@@ -161,9 +162,9 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 		if err != nil {
 			return nil, err
 		}
-		text := "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org"
+		text := "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте " + URL
 		if isNewConversation {
-			text = "Добрый день!\nСпасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте narodny-opros.org"
+			text = "Добрый день!\nСпасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте " + URL
 		}
 		text += fmt.Sprintf("\nНас уже %d человек!", totalCount)
 		return &viberReply{text: text}, nil
