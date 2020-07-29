@@ -1,8 +1,8 @@
 ignoreGeneratedHeader = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+errorCode = 1
+warningCode = 1
 
 [rule.blank-imports]
 [rule.context-as-argument]
@@ -20,5 +20,6 @@ warningCode = 0
 [rule.receiver-naming]
 [rule.time-naming]
 [rule.unexported-return]
+[rule.unused-parameter]
 [rule.indent-error-flow]
 [rule.errorf]

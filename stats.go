@@ -12,7 +12,7 @@ type statsResponse struct {
 	Total int `json:"total"`
 }
 
-func handleStats(p poll, v *viber.Viber, s *storage, w http.ResponseWriter, r *http.Request) {
+func handleStats(_ poll, _ *viber.Viber, s *storage, w http.ResponseWriter, _ *http.Request) {
 	count, err := s.PersistCount()
 	if err != nil {
 		log.Printf("Error reading count: %v", err)
