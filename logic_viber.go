@@ -69,16 +69,20 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 		storageUser.Country = callback.User.Country
 		storageUser.isChanged = true
 	}
-	if storageUser.Language != callback.User.Language {
+	if storageUser.Language == "" && callback.User.Language != "" {
 		storageUser.Language = callback.User.Language
 		storageUser.isChanged = true
 	}
-	if storageUser.MobileNetworkCode != callback.User.MNC {
+	if storageUser.MobileNetworkCode == 0 && callback.User.MNC != 0 {
 		storageUser.MobileNetworkCode = callback.User.MNC
 		storageUser.isChanged = true
 	}
-	if storageUser.MobileCountryCode != callback.User.MCC {
+	if storageUser.MobileCountryCode == 0 && callback.User.MCC != 0 {
 		storageUser.MobileCountryCode = callback.User.MCC
+		storageUser.isChanged = true
+	}
+	if storageUser.Context == "" && callback.Context != "" {
+		storageUser.Context = callback.Context
 		storageUser.isChanged = true
 	}
 
@@ -86,11 +90,6 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 		storageUser.Properties["ConversationStarted"] = "false"
 		storageUser.isChanged = true
 		return nil, nil
-	}
-
-	if callback.Event == "conversation_started" {
-		storageUser.Context = callback.Context
-		storageUser.isChanged = true
 	}
 
 	if callback.Event == "message" {
