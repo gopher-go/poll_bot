@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.60.0 // indirect
 	cloud.google.com/go/datastore v1.2.0
 	github.com/andrewkav/viber v1.0.1
+	github.com/coocood/freecache v1.1.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/joho/godotenv v1.3.0
