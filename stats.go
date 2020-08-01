@@ -44,5 +44,5 @@ func handleStats(_ poll, _ *viber.Viber, s *storage, w http.ResponseWriter, _ *h
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(statsRespBytes)
+	_, _ = w.Write(statsRespBytes)
 }
