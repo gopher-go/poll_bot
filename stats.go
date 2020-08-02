@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -34,6 +35,9 @@ func handleStats(_ poll, _ *viber.Viber, s *storage, statsDao *statsDao, w http.
 	if statsDao != nil {
 		aggs, err := statsDao.CountByFieldCached(r.Context(), residenceLocationType, residenceLocation)
 		if err != nil {
+			if err == context.Canceled {
+				return
+			}
 			log.Printf("unable to get aggregation by residence location type, err=%v", err)
 			http.Error(w, "Unable to get statistic", http.StatusInternalServerError)
 			return
