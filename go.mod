@@ -12,6 +12,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.7.1
 	github.com/mattn/go-sqlite3 v1.14.0
+	github.com/olivere/elastic/v7 v7.0.19
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/proullon/ramsql v0.0.0-20181213202341-817cee58a244

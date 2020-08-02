@@ -157,7 +157,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 	var isNewConversation = u.Properties["ConversationStarted"] != "true"
 
 	if p.isFinishedFor(u) {
-		totalCount, err := s.PersistCount()
+		totalCount, err := s.CountCached()
 		if err != nil {
 			return nil, err
 		}
@@ -171,7 +171,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 
 	var welcome string
 	if isNewConversation {
-		totalCount, err := s.PersistCount()
+		totalCount, err := s.CountCached()
 		if err != nil {
 			return nil, err
 		}

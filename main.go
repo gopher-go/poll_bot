@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/olivere/elastic/v7"
 	"log"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/datastore"
 	"github.com/andrewkav/viber"
@@ -77,9 +79,21 @@ func execute() error {
 		ld = newDatastoreLogDAO(mustGetDatastoreClient(), os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
 	}
 
+	var sd *statsDao
+	if os.Getenv("ELATIC_HOSTS") != "" {
+		log.Printf("creating stats dao, ES_HOST=%s\n", os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
+		esClient, err := elastic.NewSimpleClient(elastic.SetURL(strings.Split(os.Getenv("ELATIC_HOSTS"), ",")...),
+			elastic.SetBasicAuth(os.Getenv("ELATIC_BASIC_AUTH_USER"), os.Getenv("ELATIC_BASIC_AUTH_PASSWORD")))
+		if err != nil {
+			log.Printf("unable to create ES client, err=%v\n", err)
+		} else {
+			sd = newStatsDao(esClient)
+		}
+	}
+
 	v := viber.New(viberKey, "Народный опрос", "https://storage.googleapis.com/freeelections2020-img/bot-logo.jpg")
 	go func() {
-		err := serve(v, ud, ld)
+		err := serve(v, ud, ld, sd)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -32,6 +33,8 @@ func TestWeHaveNewMessageAfterUnsubscribe(t *testing.T) {
 	require.NoError(t, err)
 	require.Nil(t, reply)
 
+	// wait for cache to expire
+	time.Sleep(5 * time.Second)
 	reply, err = generateReplyFor(p, s, newSubscribeCallback(t, userID))
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(welcomeHeader, 1)+"\n\nУкажите, пожалуйста, Ваш возраст", reply.text)
@@ -148,6 +151,8 @@ func TestCaseInsensitive(t *testing.T) {
 	require.Equal(t, "Когда вы планируете голосовать?", reply.text)
 	require.Equal(t, reply.options, []string{"Досрочно (4-8 августа)", "В день выборов (9 августа)"})
 
+	// wait for cache to expire
+	time.Sleep(5 * time.Second)
 	reply, err = generateReplyFor(p, s, newTextCallback(t, userID, "В день выборов (9 августа)"))
 	require.NoError(t, err)
 	require.Equal(t, "Спасибо за участие в нашем опросе!\nСледите за динамикой опроса на сайте "+url+"\nНас уже 1 человек!", reply.text)

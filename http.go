@@ -11,7 +11,7 @@ import (
 	"github.com/andrewkav/viber"
 )
 
-func serve(v *viber.Viber, ud userDAO, ld logDAO) error {
+func serve(v *viber.Viber, ud userDAO, ld logDAO, sd *statsDao) error {
 	s, err := newStorage(ud, ld)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func serve(v *viber.Viber, ud userDAO, ld logDAO) error {
 	})
 
 	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
-		handleStats(p, v, s, w, r)
+		handleStats(p, v, s, sd, w, r)
 	})
 
 	port := os.Getenv("PORT")
