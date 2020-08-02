@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/coocood/freecache"
 	"math/rand"
 	"strings"
 	"testing"
@@ -47,6 +48,7 @@ func newTestStorage() (*storage, error) {
 	}
 
 	return &storage{
+		cache: freecache.NewCache(1024),
 		//users:      sync.Map{},
 		userDAO: testPersistentStorage,
 	}, nil
@@ -86,14 +88,14 @@ func TestMapStorage(t *testing.T) {
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
 
-	count, err := s.PersistCount()
+	count, err := s.Count()
 	require.NoError(t, err)
 	require.Equal(t, count, 1)
 
 	err = s.Persist(user)
 	require.NoError(t, err)
 
-	count, err = s.PersistCount()
+	count, err = s.Count()
 	require.NoError(t, err)
 	require.Equal(t, count, 1)
 
@@ -104,41 +106,3 @@ func TestMapStorage(t *testing.T) {
 	require.Equal(t, user.Properties["age"], "16")
 	require.Equal(t, user.Country, "DE")
 }
-
-/*
-func TestRealStorage(t *testing.T) {
-	err := godotenv.Load()
-	require.NoError(t, err)
-
-	s, err := newStorage()
-	require.NoError(t, err)
-
-	err = s.Clear("12")
-	require.NoError(t, err)
-
-	user, err := s.Obtain("12")
-	require.NoError(t, err)
-	require.Equal(t, user.Id, "12")
-	require.Equal(t, user.Properties["age"], "")
-	user.Properties["age"] = "16"
-
-	user, err = s.Obtain("12")
-	require.NoError(t, err)
-	require.Equal(t, user.Id, "12")
-	require.Equal(t, user.Properties["age"], "16")
-
-	err = s.Persist(user)
-	require.NoError(t, err)
-
-	count, err := s.PersistCount()
-	require.NoError(t, err)
-	require.Equal(t, count, 1)
-
-	err = s.Persist(user)
-	require.NoError(t, err)
-
-	count, err = s.PersistCount()
-	require.NoError(t, err)
-	require.Equal(t, count, 1)
-}
-*/

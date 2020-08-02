@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
+	"github.com/coocood/freecache"
 	"log"
 	"time"
 )
@@ -27,13 +30,19 @@ type logDAO interface {
 	save(al *answerLog) error
 }
 
+var (
+	userCountCacheKey = []byte("user-count")
+)
+
 type storage struct {
+	cache   *freecache.Cache
 	userDAO userDAO
 	logDAO  logDAO
 }
 
 func newStorage(ud userDAO, ld logDAO) (*storage, error) {
 	return &storage{
+		cache:   freecache.NewCache(512 * 1024 * 1024),
 		logDAO:  ld,
 		userDAO: ud,
 	}, nil
@@ -118,8 +127,8 @@ func (s *storage) Clear(id string) error {
 	return nil
 }
 
-// PersistCount - shows number of users in persistent storage
-func (s *storage) PersistCount() (int, error) {
+// Count - shows number of users in persistent storage
+func (s *storage) Count() (int, error) {
 	if s.userDAO == nil {
 		return 0, errors.New("persistence not enabled")
 	}
@@ -131,6 +140,28 @@ func (s *storage) PersistCount() (int, error) {
 	}
 
 	return count, nil
+}
+
+// CountCached - get the number of users using cache
+func (s *storage) CountCached() (count int, err error) {
+	countBytes, err := s.cache.Get(userCountCacheKey)
+	if err == nil {
+		err = gob.NewDecoder(bytes.NewBuffer(countBytes)).Decode(&count)
+		if err == nil {
+			return
+		}
+	}
+
+	count, err = s.Count()
+	if err == nil {
+		var countBytesBuff bytes.Buffer
+		err = gob.NewEncoder(&countBytesBuff).Encode(count)
+		if err == nil {
+			_ = s.cache.Set(userCountCacheKey, countBytesBuff.Bytes(), 5)
+		}
+	}
+
+	return
 }
 
 // Persist - save the user in storage
