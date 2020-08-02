@@ -80,10 +80,10 @@ func execute() error {
 	}
 
 	var sd *statsDao
-	if os.Getenv("ELATIC_HOSTS") != "" {
+	if os.Getenv("ELASTIC_HOSTS") != "" {
 		log.Printf("creating stats dao, ES_HOST=%s\n", os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
-		esClient, err := elastic.NewSimpleClient(elastic.SetURL(strings.Split(os.Getenv("ELATIC_HOSTS"), ",")...),
-			elastic.SetBasicAuth(os.Getenv("ELATIC_BASIC_AUTH_USER"), os.Getenv("ELATIC_BASIC_AUTH_PASSWORD")))
+		esClient, err := elastic.NewSimpleClient(elastic.SetURL(strings.Split(os.Getenv("ELASTIC_HOSTS"), ",")...),
+			elastic.SetBasicAuth(os.Getenv("ELASTIC_BASIC_AUTH_USER"), os.Getenv("ELASTIC_BASIC_AUTH_PASSWORD")))
 		if err != nil {
 			log.Printf("unable to create ES client, err=%v\n", err)
 		} else {
