@@ -99,9 +99,31 @@ func generateOurPoll() poll {
 	})
 
 	ret.add(pollItem{
+		id: "residence_location",
+		question: func(_ *storageUser, _ *ViberCallback) string {
+			return "Выберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск"
+		},
+		possibleAnswers: []string{
+			"Брестская",
+			"Витебская",
+			"Гомельская",
+			"Гродненская",
+			"Минская",
+			"Могилевская",
+			"Минск",
+			"Проживаю за пределами РБ",
+		},
+		persistAnswer: func(answer string, u *storageUser) error {
+			u.Properties["residence_location"] = answer
+			u.isChanged = true
+			return nil
+		},
+	})
+
+	ret.add(pollItem{
 		id: "candidate",
 		question: func(_ *storageUser, _ *ViberCallback) string {
-			return "За кого Вы планируете проголосовать?"
+			return "За кого Вы планируете проголосовать/проголосовали?"
 		},
 		possibleAnswers: []string{
 			"Дмитриев", "Тихановская",
@@ -127,28 +149,6 @@ func generateOurPoll() poll {
 		},
 		persistAnswer: func(answer string, u *storageUser) error {
 			u.Properties["gender"] = answer
-			u.isChanged = true
-			return nil
-		},
-	})
-
-	ret.add(pollItem{
-		id: "residence_location",
-		question: func(_ *storageUser, _ *ViberCallback) string {
-			return "Выберите область, в которой Вы проживаете. Если Вы проживаете в Минске, выберите Минск"
-		},
-		possibleAnswers: []string{
-			"Брестская",
-			"Витебская",
-			"Гомельская",
-			"Гродненская",
-			"Минская",
-			"Могилевская",
-			"Минск",
-			"Проживаю за пределами РБ",
-		},
-		persistAnswer: func(answer string, u *storageUser) error {
-			u.Properties["residence_location"] = answer
 			u.isChanged = true
 			return nil
 		},
@@ -192,21 +192,22 @@ func generateOurPoll() poll {
 		},
 	})
 
-    ret.add(pollItem{
-        id: "vote_day",
-        question: func(_ *storageUser, _ *ViberCallback) string {
-            return "Когда вы планируете голосовать?"
-        },
-        possibleAnswers: []string{
-            "Досрочно (4-8 августа)",
-            "В день выборов (9 августа)",
-        },
-        persistAnswer: func(answer string, u *storageUser) error {
-            u.Properties["vote_day"] = answer
-            u.isChanged = true
-            return nil
-        },
-    })
+	ret.add(pollItem{
+		id: "vote_day",
+		question: func(_ *storageUser, _ *ViberCallback) string {
+			return "Когда вы планируете голосовать или уже проголосовали?"
+		},
+		possibleAnswers: []string{
+			"Досрочно (4-8 августа)",
+			"В день выборов (9 августа)",
+			"Не пойду голосовать",
+		},
+		persistAnswer: func(answer string, u *storageUser) error {
+			u.Properties["vote_day"] = answer
+			u.isChanged = true
+			return nil
+		},
+	})
 
 	return ret
 }
