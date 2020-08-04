@@ -3,14 +3,35 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
 	"cloud.google.com/go/datastore"
 	"github.com/andrewkav/viber"
 	"github.com/gopher-go/poll_bot"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/compute/v1"
 )
 
+//DATASTORE_PROJECT_ID=freeelections2020  DATASTORE_USERS_TABLE=users_dev VIBER_KEY=4bdcdb0d47e7d3db-9e80cfbcec46b16e  ./details
+func MustGetDatastoreClient() *datastore.Client {
+	data, err := ioutil.ReadFile("filePath")
+	if err != nil {
+		log.Fatal(err)
+	}
+	creds, err := google.CredentialsFromJSON(context.Background(), data, compute.ComputeScope)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(creds.ProjectID)
+	DSClient, err := datastore.NewClient(context.Background(), creds.ProjectID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return DSClient
+}
 func main() {
 	viberKey := os.Getenv("VIBER_KEY")
 	fmt.Println(viberKey)
@@ -19,7 +40,7 @@ func main() {
 	var ud *poll_bot.DatastoreUserDAO
 	if os.Getenv("DATASTORE_USERS_TABLE") != "" {
 		log.Printf("creating datatore user dao, entity kind = %s\n", os.Getenv("DATASTORE_USERS_TABLE"))
-		ud = poll_bot.NewDatastoreUserDAO(poll_bot.MustGetDatastoreClient(), os.Getenv("DATASTORE_USERS_TABLE"))
+		ud = poll_bot.NewDatastoreUserDAO(MustGetDatastoreClient(), os.Getenv("DATASTORE_USERS_TABLE"))
 	}
 
 	var users []poll_bot.StorageUser
