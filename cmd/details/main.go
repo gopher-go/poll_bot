@@ -65,6 +65,8 @@ func main() {
 			continue
 		}
 		err = ud.Update(&i, det.Mcc, det.Mnc)
+		fmt.Println("IDS", i.ID, det.Mcc, det.Mnc)
+		fmt.Printf("IDS with details %d, %d, %d , %+v\n", i.ID, det.Mcc, det.Mnc, det)
 		if err != nil {
 			fmt.Println("Error Updating database : ", err)
 		}
