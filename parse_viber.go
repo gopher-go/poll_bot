@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"encoding/json"
@@ -13,9 +13,12 @@ type Message struct {
 
 // User - Viber User
 type User struct {
-	ID      string `json:"id,omitempty"`
-	Name    string `json:"name,omitempty"`
-	Country string `json:"country,omitempty"`
+	ID       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Country  string `json:"country,omitempty"`
+	Language string `json:"language"`
+	MNC      int    `json:"mnc"`
+	MCC      int    `json:"mcc"`
 }
 
 // ViberCallback - Viber Callback

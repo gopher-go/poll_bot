@@ -1,10 +1,13 @@
-package main
+package poll_bot
 
 import (
 	"context"
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
+	"github.com/olivere/elastic/v7"
 
 	"cloud.google.com/go/datastore"
 	"github.com/andrewkav/viber"
@@ -35,21 +38,20 @@ func setViberWebhook(v *viber.Viber, url string) error {
 		return err
 	}
 
-	return err
-
+	return nil
 }
 
-func mustGetDatastoreClient() *datastore.Client {
+func MustGetDatastoreClient() *datastore.Client {
 	creds, err := google.FindDefaultCredentials(context.Background(), compute.ComputeScope)
 	if err != nil {
 		log.Fatal(err)
 	}
-	dsClient, err := datastore.NewClient(context.Background(), creds.ProjectID)
+	DSClient, err := datastore.NewClient(context.Background(), creds.ProjectID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return dsClient
+	return DSClient
 }
 
 func execute() error {
@@ -64,7 +66,7 @@ func execute() error {
 	var ud userDAO
 	if os.Getenv("DATASTORE_USERS_TABLE") != "" {
 		log.Printf("creating datatore user dao, entity kind = %s\n", os.Getenv("DATASTORE_USERS_TABLE"))
-		ud = newDatastoreUserDAO(mustGetDatastoreClient(), os.Getenv("DATASTORE_USERS_TABLE"))
+		ud = NewDatastoreUserDAO(MustGetDatastoreClient(), os.Getenv("DATASTORE_USERS_TABLE"))
 	} else {
 		ud, err = newPQUserDAO(os.Getenv("DB_CONNECTION"))
 		if err != nil {
@@ -75,12 +77,24 @@ func execute() error {
 	var ld logDAO
 	if os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE") != "" {
 		log.Printf("creating datastore log answer dao, entity kind = %s\n", os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
-		ld = newDatastoreLogDAO(mustGetDatastoreClient(), os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
+		ld = newDatastoreLogDAO(MustGetDatastoreClient(), os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
+	}
+
+	var sd *statsDao
+	if os.Getenv("ELASTIC_HOSTS") != "" {
+		log.Printf("creating stats dao, ES_HOST=%s\n", os.Getenv("DATASTORE_USER_ANSWER_LOG_TABLE"))
+		esClient, err := elastic.NewSimpleClient(elastic.SetURL(strings.Split(os.Getenv("ELASTIC_HOSTS"), ",")...),
+			elastic.SetBasicAuth(os.Getenv("ELASTIC_BASIC_AUTH_USER"), os.Getenv("ELASTIC_BASIC_AUTH_PASSWORD")))
+		if err != nil {
+			log.Printf("unable to create ES client, err=%v\n", err)
+		} else {
+			sd = newStatsDao(esClient)
+		}
 	}
 
 	v := viber.New(viberKey, "Народный опрос", "https://storage.googleapis.com/freeelections2020-img/bot-logo.jpg")
 	go func() {
-		err := serve(v, ud, ld)
+		err := serve(v, ud, ld, sd)
 		if err != nil {
 			log.Fatal(err)
 		}

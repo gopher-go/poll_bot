@@ -1,8 +1,9 @@
-package main
+package poll_bot
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestKeyboardForOptions(t *testing.T) {

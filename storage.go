@@ -1,16 +1,20 @@
-package main
+package poll_bot
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"log"
 	"time"
+
+	"github.com/coocood/freecache"
 )
 
 type userDAO interface {
-	load(id string) (*storageUser, error)
+	load(id string) (*StorageUser, error)
 	delete(id string) error
 	count() (int, error)
-	save(user *storageUser) error
+	save(user *StorageUser) error
 }
 
 type answerLog struct {
@@ -27,31 +31,40 @@ type logDAO interface {
 	save(al *answerLog) error
 }
 
+var (
+	userCountCacheKey = []byte("user-count")
+)
+
 type storage struct {
+	cache   *freecache.Cache
 	userDAO userDAO
 	logDAO  logDAO
 }
 
 func newStorage(ud userDAO, ld logDAO) (*storage, error) {
 	return &storage{
+		cache:   freecache.NewCache(512 * 1024 * 1024),
 		logDAO:  ld,
 		userDAO: ud,
 	}, nil
 }
 
-type storageUser struct {
-	ID         string
-	Country    string
-	Level      int
-	Properties map[string]string
-	Candidate  string
-	Context    string
-	CreatedAt  time.Time
+type StorageUser struct {
+	ID                string
+	Country           string
+	Language          string
+	MobileCountryCode int
+	MobileNetworkCode int
+	Level             int
+	Properties        map[string]string
+	Candidate         string
+	Context           string
+	CreatedAt         time.Time
 
 	isChanged bool
 }
 
-func (u *storageUser) validate() error {
+func (u *StorageUser) validate() error {
 	if u.ID == "" {
 		return errors.New("Empty user id")
 	}
@@ -65,7 +78,7 @@ func (s *storage) LogAnswer(al *answerLog) error {
 	return nil
 }
 
-func (s *storage) Obtain(id string) (*storageUser, error) {
+func (s *storage) Obtain(id string) (*StorageUser, error) {
 	if id == "" {
 		return nil, errors.New("Unable to obtain empty id")
 	}
@@ -79,7 +92,7 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 		return persistedUser, persistedUser.validate()
 	}
 
-	newUser := &storageUser{
+	newUser := &StorageUser{
 		ID:         id,
 		Properties: map[string]string{},
 	}
@@ -90,7 +103,7 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 }
 
 // internal
-func (s *storage) fromPersisted(id string) (*storageUser, error) {
+func (s *storage) fromPersisted(id string) (*StorageUser, error) {
 	if s.userDAO == nil {
 		return nil, errors.New("persistence not enabled")
 	}
@@ -115,8 +128,8 @@ func (s *storage) Clear(id string) error {
 	return nil
 }
 
-// PersistCount - shows number of users in persistent storage
-func (s *storage) PersistCount() (int, error) {
+// Count - shows number of users in persistent storage
+func (s *storage) Count() (int, error) {
 	if s.userDAO == nil {
 		return 0, errors.New("persistence not enabled")
 	}
@@ -130,8 +143,30 @@ func (s *storage) PersistCount() (int, error) {
 	return count, nil
 }
 
+// CountCached - get the number of users using cache
+func (s *storage) CountCached() (count int, err error) {
+	countBytes, err := s.cache.Get(userCountCacheKey)
+	if err == nil {
+		err = gob.NewDecoder(bytes.NewBuffer(countBytes)).Decode(&count)
+		if err == nil {
+			return
+		}
+	}
+
+	count, err = s.Count()
+	if err == nil {
+		var countBytesBuff bytes.Buffer
+		err = gob.NewEncoder(&countBytesBuff).Encode(count)
+		if err == nil {
+			_ = s.cache.Set(userCountCacheKey, countBytesBuff.Bytes(), 5)
+		}
+	}
+
+	return
+}
+
 // Persist - save the user in storage
-func (s *storage) Persist(user *storageUser) error {
+func (s *storage) Persist(user *StorageUser) error {
 	if s.userDAO == nil {
 		return errors.New("persistence not enabled")
 	}

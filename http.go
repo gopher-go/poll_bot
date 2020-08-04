@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"github.com/andrewkav/viber"
 )
 
-func serve(v *viber.Viber, ud userDAO, ld logDAO) error {
+func serve(v *viber.Viber, ud userDAO, ld logDAO, sd *statsDao) error {
 	s, err := newStorage(ud, ld)
 	if err != nil {
 		return err
@@ -21,6 +21,10 @@ func serve(v *viber.Viber, ud userDAO, ld logDAO) error {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		handleMain(p, v, s, w, r)
+	})
+
+	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		handleStats(p, v, s, sd, w, r)
 	})
 
 	port := os.Getenv("PORT")

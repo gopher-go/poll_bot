@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 
 type datastoreLogDAO struct {
 	*datastore.Client
-	entityKind string
+	EntityKind string
 }
 
-func newDatastoreLogDAO(c *datastore.Client, entityKind string) *datastoreLogDAO {
+func newDatastoreLogDAO(c *datastore.Client, EntityKind string) *datastoreLogDAO {
 	return &datastoreLogDAO{
 		Client:     c,
-		entityKind: entityKind,
+		EntityKind: EntityKind,
 	}
 }
 
@@ -24,6 +24,6 @@ func datastoreAnswerLogRowKey(al *answerLog) string {
 }
 
 func (d datastoreLogDAO) save(al *answerLog) error {
-	_, err := d.Put(context.Background(), datastore.NameKey(d.entityKind, datastoreAnswerLogRowKey(al), nil), al)
+	_, err := d.Put(context.Background(), datastore.NameKey(d.EntityKind, datastoreAnswerLogRowKey(al), nil), al)
 	return err
 }
