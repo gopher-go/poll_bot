@@ -15,8 +15,9 @@ import (
 )
 
 //DATASTORE_PROJECT_ID=freeelections2020  DATASTORE_USERS_TABLE=users_dev VIBER_KEY=4bdcdb0d47e7d3db-9e80cfbcec46b16e  ./details
+
 func MustGetDatastoreClient() *datastore.Client {
-	data, err := ioutil.ReadFile("filePath")
+	data, err := ioutil.ReadFile(os.Getenv("APP_DEFAULT_JSON_PATH"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,10 +57,17 @@ func main() {
 			//all = []string{}
 			c = 0
 			fmt.Println(k, "Progress")
-			os.Exit(1)
+			//os.Exit(1)
 		}
-		det := getDetails(i.ID, v)
-		ud.Update(&i, det.Mcc, det.Mnc)
+		det, err := getDetails(i.ID, v)
+		if err != nil {
+			fmt.Println("Err getting details", err)
+			continue
+		}
+		err = ud.Update(&i, det.Mcc, det.Mnc)
+		if err != nil {
+			fmt.Println("Error Updating database : ", err)
+		}
 		fmt.Println(i)
 		//all = append(all, i[0])
 		c++
@@ -68,13 +76,13 @@ func main() {
 	fmt.Println("Done")
 }
 
-func getDetails(userId string, v *viber.Viber) viber.UserDetails {
+func getDetails(userId string, v *viber.Viber) (viber.UserDetails, error) {
 	details, err := v.UserDetails(userId)
 	if err != nil {
 		fmt.Println(err)
-		return details
+		return details, err
 	}
-	return details
+	return details, nil
 }
 
 func do(all []string, v *viber.Viber) {
