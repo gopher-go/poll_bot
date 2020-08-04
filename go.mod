@@ -1,4 +1,4 @@
-module poll_bot
+module  github.com/gopher-go/poll_bot
 
 go 1.14
 
