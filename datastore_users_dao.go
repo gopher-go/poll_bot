@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ type dsclient interface {
 	Delete(ctx context.Context, key *datastore.Key) error
 	Get(ctx context.Context, key *datastore.Key, dst interface{}) (err error)
 	Put(ctx context.Context, key *datastore.Key, src interface{}) (*datastore.Key, error)
+	NewTransaction(ctx context.Context, opts ...datastore.TransactionOption) (t *datastore.Transaction, err error)
 }
 
 type datastoreUserDAO struct {
@@ -109,6 +111,27 @@ func (d datastoreUserDAO) count() (int, error) {
 func (d datastoreUserDAO) save(user *storageUser) error {
 	user.CreatedAt = time.Now().UTC()
 	_, err := d.Put(context.Background(), datastore.NameKey(d.entityKind, user.ID, nil), user)
+	return err
+}
+
+func (d datastoreUserDAO) Update(user *storageUser, MCC, MNC int) error {
+	tx, err := d.dsclient.NewTransaction(context.Background())
+	if err != nil {
+		return fmt.Errorf("client.NewTransaction: %v", err)
+	}
+	var userGet storageUser
+	userKey := datastore.NameKey(d.entityKind, user.ID, nil)
+	if err := tx.Get(userKey, &userGet); err != nil {
+		return fmt.Errorf("tx.Get: %v", err)
+	}
+	userGet.MobileCountryCode = MCC
+	userGet.MobileNetworkCode = MNC
+	if _, err := tx.Put(userKey, &userGet); err != nil {
+		return fmt.Errorf("tx.Put: %v", err)
+	}
+	if _, err := tx.Commit(); err != nil {
+		return fmt.Errorf("tx.Commit: %v", err)
+	}
 	return err
 }
 
