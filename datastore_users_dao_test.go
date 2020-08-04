@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"context"
@@ -16,18 +16,18 @@ func _TestDatastoreUserDAOSave(t *testing.T) {
 	c, err := datastore.NewClient(context.Background(), "test")
 	require.NoError(t, err)
 
-	ds := datastoreUserDAO{
-		dsclient:   c,
-		entityKind: "user",
+	ds := DatastoreUserDAO{
+		DSClient:   c,
+		EntityKind: "user",
 	}
 
-	err = ds.save(&storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1})
+	err = ds.save(&StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1})
 	require.NoError(t, err)
 
 	su, err := ds.load("test")
 	require.NoError(t, err)
 	su.CreatedAt = time.Time{}
-	require.Equal(t, &storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1}, su)
+	require.Equal(t, &StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 1}, su)
 }
 
 func _TestDatastoreUserDAOUpdate(t *testing.T) {
@@ -36,26 +36,26 @@ func _TestDatastoreUserDAOUpdate(t *testing.T) {
 	require.NoError(t, err)
 
 	kind := "user"
-	ds := datastoreUserDAO{
-		dsclient:   c,
-		entityKind: kind,
+	ds := DatastoreUserDAO{
+		DSClient:   c,
+		EntityKind: kind,
 	}
 
-	err = ds.save(&storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 0})
+	err = ds.save(&StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 0})
 	require.NoError(t, err)
 
 	fmt.Println(ds.count())
-	var users []storageUser
+	var users []StorageUser
 	// .Filter("mcc =", 0) is not working
-	g, err := c.GetAll(context.Background(), datastore.NewQuery(ds.entityKind), &users)
+	g, err := c.GetAll(context.Background(), datastore.NewQuery(ds.EntityKind), &users)
 	fmt.Println(g)
 	fmt.Println(users)
 	for _, v := range users {
 		err := ds.Update(&v, 2, 3)
 		require.NoError(t, err)
 	}
-	var users2 []storageUser
-	g, err = c.GetAll(context.Background(), datastore.NewQuery(ds.entityKind), &users2)
+	var users2 []StorageUser
+	g, err = c.GetAll(context.Background(), datastore.NewQuery(ds.EntityKind), &users2)
 
 	for _, v := range users2 {
 		fmt.Printf("%+v", v)
@@ -65,5 +65,5 @@ func _TestDatastoreUserDAOUpdate(t *testing.T) {
 	su, err := ds.load("test")
 	require.NoError(t, err)
 	su.CreatedAt = time.Time{}
-	require.Equal(t, &storageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 2, MobileNetworkCode: 3}, su)
+	require.Equal(t, &StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 2, MobileNetworkCode: 3}, su)
 }

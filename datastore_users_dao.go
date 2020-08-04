@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"context"
@@ -10,17 +10,18 @@ import (
 	"cloud.google.com/go/datastore"
 )
 
-type dsclient interface {
+type DSClient interface {
 	Count(ctx context.Context, q *datastore.Query) (n int, err error)
 	Delete(ctx context.Context, key *datastore.Key) error
 	Get(ctx context.Context, key *datastore.Key, dst interface{}) (err error)
 	Put(ctx context.Context, key *datastore.Key, src interface{}) (*datastore.Key, error)
 	NewTransaction(ctx context.Context, opts ...datastore.TransactionOption) (t *datastore.Transaction, err error)
+	GetAll(ctx context.Context, q *datastore.Query, dst interface{}) (keys []*datastore.Key, err error)
 }
 
-type datastoreUserDAO struct {
-	dsclient
-	entityKind string
+type DatastoreUserDAO struct {
+	DSClient
+	EntityKind string
 }
 
 func getInt(i interface{}) int {
@@ -42,7 +43,7 @@ func getString(i interface{}) string {
 	return iv.String()
 }
 
-func (u *storageUser) Load(properties []datastore.Property) error {
+func (u *StorageUser) Load(properties []datastore.Property) error {
 	propMap := map[string]datastore.Property{}
 	for i := range properties {
 		propMap[properties[i].Name] = properties[i]
@@ -68,7 +69,7 @@ func (u *storageUser) Load(properties []datastore.Property) error {
 	return nil
 }
 
-func (u *storageUser) Save() ([]datastore.Property, error) {
+func (u *StorageUser) Save() ([]datastore.Property, error) {
 	var props []datastore.Property
 
 	props = append(props, datastore.Property{Name: "id", Value: u.ID})
@@ -88,9 +89,9 @@ func (u *storageUser) Save() ([]datastore.Property, error) {
 	return props, nil
 }
 
-func (d datastoreUserDAO) load(id string) (*storageUser, error) {
-	var u storageUser
-	if err := d.Get(context.Background(), datastore.NameKey(d.entityKind, id, nil), &u); err != nil {
+func (d DatastoreUserDAO) load(id string) (*StorageUser, error) {
+	var u StorageUser
+	if err := d.Get(context.Background(), datastore.NameKey(d.EntityKind, id, nil), &u); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil
 		}
@@ -100,27 +101,27 @@ func (d datastoreUserDAO) load(id string) (*storageUser, error) {
 	return &u, nil
 }
 
-func (d datastoreUserDAO) delete(id string) error {
-	return d.Delete(context.Background(), datastore.NameKey(d.entityKind, id, nil))
+func (d DatastoreUserDAO) delete(id string) error {
+	return d.Delete(context.Background(), datastore.NameKey(d.EntityKind, id, nil))
 }
 
-func (d datastoreUserDAO) count() (int, error) {
-	return d.Count(context.Background(), datastore.NewQuery(d.entityKind))
+func (d DatastoreUserDAO) count() (int, error) {
+	return d.Count(context.Background(), datastore.NewQuery(d.EntityKind))
 }
 
-func (d datastoreUserDAO) save(user *storageUser) error {
+func (d DatastoreUserDAO) save(user *StorageUser) error {
 	user.CreatedAt = time.Now().UTC()
-	_, err := d.Put(context.Background(), datastore.NameKey(d.entityKind, user.ID, nil), user)
+	_, err := d.Put(context.Background(), datastore.NameKey(d.EntityKind, user.ID, nil), user)
 	return err
 }
 
-func (d datastoreUserDAO) Update(user *storageUser, MCC, MNC int) error {
-	tx, err := d.dsclient.NewTransaction(context.Background())
+func (d DatastoreUserDAO) Update(user *StorageUser, MCC, MNC int) error {
+	tx, err := d.DSClient.NewTransaction(context.Background())
 	if err != nil {
 		return fmt.Errorf("client.NewTransaction: %v", err)
 	}
-	var userGet storageUser
-	userKey := datastore.NameKey(d.entityKind, user.ID, nil)
+	var userGet StorageUser
+	userKey := datastore.NameKey(d.EntityKind, user.ID, nil)
 	if err := tx.Get(userKey, &userGet); err != nil {
 		return fmt.Errorf("tx.Get: %v", err)
 	}
@@ -135,9 +136,9 @@ func (d datastoreUserDAO) Update(user *storageUser, MCC, MNC int) error {
 	return err
 }
 
-func newDatastoreUserDAO(c *datastore.Client, entityKind string) *datastoreUserDAO {
-	return &datastoreUserDAO{
-		dsclient:   c,
-		entityKind: entityKind,
+func NewDatastoreUserDAO(c *datastore.Client, EntityKind string) *DatastoreUserDAO {
+	return &DatastoreUserDAO{
+		DSClient:   c,
+		EntityKind: EntityKind,
 	}
 }

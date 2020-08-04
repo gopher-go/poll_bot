@@ -1,19 +1,20 @@
-package main
+package poll_bot
 
 import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	"github.com/coocood/freecache"
 	"log"
 	"time"
+
+	"github.com/coocood/freecache"
 )
 
 type userDAO interface {
-	load(id string) (*storageUser, error)
+	load(id string) (*StorageUser, error)
 	delete(id string) error
 	count() (int, error)
-	save(user *storageUser) error
+	save(user *StorageUser) error
 }
 
 type answerLog struct {
@@ -48,7 +49,7 @@ func newStorage(ud userDAO, ld logDAO) (*storage, error) {
 	}, nil
 }
 
-type storageUser struct {
+type StorageUser struct {
 	ID                string
 	Country           string
 	Language          string
@@ -63,7 +64,7 @@ type storageUser struct {
 	isChanged bool
 }
 
-func (u *storageUser) validate() error {
+func (u *StorageUser) validate() error {
 	if u.ID == "" {
 		return errors.New("Empty user id")
 	}
@@ -77,7 +78,7 @@ func (s *storage) LogAnswer(al *answerLog) error {
 	return nil
 }
 
-func (s *storage) Obtain(id string) (*storageUser, error) {
+func (s *storage) Obtain(id string) (*StorageUser, error) {
 	if id == "" {
 		return nil, errors.New("Unable to obtain empty id")
 	}
@@ -91,7 +92,7 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 		return persistedUser, persistedUser.validate()
 	}
 
-	newUser := &storageUser{
+	newUser := &StorageUser{
 		ID:         id,
 		Properties: map[string]string{},
 	}
@@ -102,7 +103,7 @@ func (s *storage) Obtain(id string) (*storageUser, error) {
 }
 
 // internal
-func (s *storage) fromPersisted(id string) (*storageUser, error) {
+func (s *storage) fromPersisted(id string) (*StorageUser, error) {
 	if s.userDAO == nil {
 		return nil, errors.New("persistence not enabled")
 	}
@@ -165,7 +166,7 @@ func (s *storage) CountCached() (count int, err error) {
 }
 
 // Persist - save the user in storage
-func (s *storage) Persist(user *storageUser) error {
+func (s *storage) Persist(user *StorageUser) error {
 	if s.userDAO == nil {
 		return errors.New("persistence not enabled")
 	}

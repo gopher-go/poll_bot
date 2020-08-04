@@ -1,11 +1,12 @@
-package main
+package poll_bot
 
 import (
 	"context"
 	"encoding/json"
+	"strings"
+
 	"github.com/coocood/freecache"
 	"github.com/olivere/elastic/v7"
-	"strings"
 )
 
 const (

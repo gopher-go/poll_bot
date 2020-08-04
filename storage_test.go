@@ -1,12 +1,13 @@
-package main
+package poll_bot
 
 import (
 	"database/sql"
-	"github.com/coocood/freecache"
 	"math/rand"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/coocood/freecache"
 
 	_ "github.com/proullon/ramsql/driver"
 	"github.com/stretchr/testify/require"

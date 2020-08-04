@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"encoding/json"

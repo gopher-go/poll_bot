@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"errors"
@@ -54,50 +54,50 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 		return &viberReply{text: fmt.Sprintf("Your storage cleared with %v", err)}, nil
 	}
 
-	storageUser, err := s.Obtain(callback.User.ID)
+	StorageUser, err := s.Obtain(callback.User.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	defer func() {
-		if storageUser.isChanged {
-			_ = s.Persist(storageUser)
+		if StorageUser.isChanged {
+			_ = s.Persist(StorageUser)
 		}
 	}()
 
-	if storageUser.Country == "" && callback.User.Country != "" {
-		storageUser.Country = callback.User.Country
-		storageUser.isChanged = true
+	if StorageUser.Country == "" && callback.User.Country != "" {
+		StorageUser.Country = callback.User.Country
+		StorageUser.isChanged = true
 	}
-	if storageUser.Language == "" && callback.User.Language != "" {
-		storageUser.Language = callback.User.Language
-		storageUser.isChanged = true
+	if StorageUser.Language == "" && callback.User.Language != "" {
+		StorageUser.Language = callback.User.Language
+		StorageUser.isChanged = true
 	}
-	if storageUser.MobileNetworkCode == 0 && callback.User.MNC != 0 {
-		storageUser.MobileNetworkCode = callback.User.MNC
-		storageUser.isChanged = true
+	if StorageUser.MobileNetworkCode == 0 && callback.User.MNC != 0 {
+		StorageUser.MobileNetworkCode = callback.User.MNC
+		StorageUser.isChanged = true
 	}
-	if storageUser.MobileCountryCode == 0 && callback.User.MCC != 0 {
-		storageUser.MobileCountryCode = callback.User.MCC
-		storageUser.isChanged = true
+	if StorageUser.MobileCountryCode == 0 && callback.User.MCC != 0 {
+		StorageUser.MobileCountryCode = callback.User.MCC
+		StorageUser.isChanged = true
 	}
-	if storageUser.Context == "" && callback.Context != "" {
-		storageUser.Context = callback.Context
-		storageUser.isChanged = true
+	if StorageUser.Context == "" && callback.Context != "" {
+		StorageUser.Context = callback.Context
+		StorageUser.isChanged = true
 	}
 
 	if callback.Event == "unsubscribed" {
-		storageUser.Properties["ConversationStarted"] = "false"
-		storageUser.isChanged = true
+		StorageUser.Properties["ConversationStarted"] = "false"
+		StorageUser.isChanged = true
 		return nil, nil
 	}
 
 	if callback.Event == "message" {
-		pi := poll.getLevel(storageUser.Level)
+		pi := poll.getLevel(StorageUser.Level)
 
 		al := answerLog{
-			UserID:      storageUser.ID,
-			UserContext: storageUser.Context,
+			UserID:      StorageUser.ID,
+			UserContext: StorageUser.Context,
 			QuestionID:  pi.id,
 			Answer:      callback.Message.Text,
 			AnswerLevel: pi.level,
@@ -105,12 +105,12 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 			CreatedAt:   time.Now().UTC(),
 		}
 
-		err := analyseAnswer(pi, storageUser, callback)
+		err := analyseAnswer(pi, StorageUser, callback)
 		if err != nil {
-			reply, _ := getViberReplyForLevel(poll, s, storageUser, callback)
+			reply, _ := getViberReplyForLevel(poll, s, StorageUser, callback)
 
 			// if finished don't generate error
-			if !poll.isFinishedFor(storageUser) {
+			if !poll.isFinishedFor(StorageUser) {
 				reply.text = err.Error() + "\n\n" + reply.text
 			}
 
@@ -120,21 +120,21 @@ func generateReplyFor(poll poll, s *storage, callback *ViberCallback) (*viberRep
 			return reply, nil
 		}
 
-		storageUser.Level++
-		storageUser.isChanged = true
+		StorageUser.Level++
+		StorageUser.isChanged = true
 
 		logUserAnswer(s, &al)
 
-		return getViberReplyForLevel(poll, s, storageUser, callback)
+		return getViberReplyForLevel(poll, s, StorageUser, callback)
 	}
 
-	if storageUser.Properties["ConversationStarted"] != "true" {
-		reply, err := getViberReplyForLevel(poll, s, storageUser, callback)
+	if StorageUser.Properties["ConversationStarted"] != "true" {
+		reply, err := getViberReplyForLevel(poll, s, StorageUser, callback)
 		if err != nil {
 			return nil, err
 		}
-		storageUser.Properties["ConversationStarted"] = "true"
-		storageUser.isChanged = true
+		StorageUser.Properties["ConversationStarted"] = "true"
+		StorageUser.isChanged = true
 		return reply, nil
 	}
 
@@ -152,7 +152,7 @@ const welcomeHeader = `Добро пожаловать в проект «Нар�
 
 Чтобы ответить на вопрос, выберите один из предложенных вариантов.`
 
-func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback) (*viberReply, error) {
+func getViberReplyForLevel(p poll, s *storage, u *StorageUser, c *ViberCallback) (*viberReply, error) {
 
 	var isNewConversation = u.Properties["ConversationStarted"] != "true"
 
@@ -186,7 +186,7 @@ func getViberReplyForLevel(p poll, s *storage, u *storageUser, c *ViberCallback)
 	}, nil
 }
 
-func analyseAnswer(pi pollItem, u *storageUser, c *ViberCallback) error {
+func analyseAnswer(pi pollItem, u *StorageUser, c *ViberCallback) error {
 	answer := c.Message.Text
 	normalAnswer := answer
 	if !caseSensitive {

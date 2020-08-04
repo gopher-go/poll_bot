@@ -1,4 +1,4 @@
-package main
+package poll_bot
 
 import (
 	"database/sql"
@@ -57,9 +57,9 @@ func newPQUserDAO(connStr string) (*persistenseStorage, error) {
 	}, nil
 }
 
-func (s *persistenseStorage) load(id string) (*storageUser, error) {
+func (s *persistenseStorage) load(id string) (*StorageUser, error) {
 	sqlStatement := `SELECT id, country, context, level, properties, candidate FROM users WHERE id = $1;`
-	var user storageUser
+	var user StorageUser
 	row := s.db.QueryRow(sqlStatement, id)
 	var properties string
 	err := row.Scan(&user.ID, &user.Country, &user.Context, &user.Level, &properties, &user.Candidate)
@@ -94,7 +94,18 @@ func (s *persistenseStorage) count() (int, error) {
 	return count, nil
 }
 
-func (s *persistenseStorage) save(user *storageUser) error {
+func (s *persistenseStorage) getNotFinished() (int, error) {
+	sqlStatement := `SELECT * FROM users WHERE candidate is NULL;`
+	row := s.db.QueryRow(sqlStatement)
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (s *persistenseStorage) save(user *StorageUser) error {
 	sqlStatement := `SELECT COUNT(*) FROM users WHERE id = $1;`
 	row := s.db.QueryRow(sqlStatement, user.ID)
 	var count int
