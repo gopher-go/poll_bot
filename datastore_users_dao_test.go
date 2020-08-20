@@ -67,3 +67,48 @@ func _TestDatastoreUserDAOUpdate(t *testing.T) {
 	su.CreatedAt = time.Time{}
 	require.Equal(t, &StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, MobileCountryCode: 2, MobileNetworkCode: 3}, su)
 }
+
+func TestDatastoreUserDAOUpdateLvl(t *testing.T) {
+	os.Setenv("DATASTORE_EMULATOR_HOST", "localhost:8081")
+	c, err := datastore.NewClient(context.Background(), "test")
+	require.NoError(t, err)
+
+	kind := "user"
+	ds := DatastoreUserDAO{
+		DSClient:   c,
+		EntityKind: kind,
+	}
+
+	err = ds.save(&StorageUser{ID: "test", Country: "Bel", Context: "IP", Language: "e", Candidate: "Тих", Properties: map[string]string{"test": "test"}, MobileCountryCode: 0})
+
+	err = ds.save(&StorageUser{ID: "test2", Country: "Bel2", Level: 9, Language: "e", Candidate: "Тих", Properties: map[string]string{"test": "test"}, MobileCountryCode: 0})
+	require.NoError(t, err)
+
+	fmt.Println(ds.count())
+	var users []StorageUser
+	// .Filter("mcc =", 0) is not working
+	g, err := c.GetAll(context.Background(), datastore.NewQuery(ds.EntityKind), &users)
+	fmt.Println(g)
+	fmt.Println(users)
+	for _, v := range users {
+		err := ds.UpdateUserLvl(&v, 2)
+		require.NoError(t, err)
+	}
+	var users2 []StorageUser
+	g, err = c.GetAll(context.Background(), datastore.NewQuery(ds.EntityKind), &users2)
+
+	for _, v := range users2 {
+		fmt.Printf("%+v", v)
+	}
+
+	require.NoError(t, err)
+	su, err := ds.load("test")
+	require.NoError(t, err)
+	su.CreatedAt = time.Time{}
+	require.Equal(t, &StorageUser{ID: "test", Properties: map[string]string{"test": "test"}, Context: "IP", Candidate: "Тих", Country: "Bel", Language: "e", Level: 2}, su)
+
+	su, err = ds.load("test2")
+	require.NoError(t, err)
+	su.CreatedAt = time.Time{}
+	require.Equal(t, &StorageUser{ID: "test2", Properties: map[string]string{"test": "test"}, Candidate: "Тих", Country: "Bel2", Language: "e", Level: 2}, su)
+}

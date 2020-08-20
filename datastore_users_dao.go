@@ -136,6 +136,26 @@ func (d DatastoreUserDAO) Update(user *StorageUser, MCC, MNC int) error {
 	return err
 }
 
+func (d DatastoreUserDAO) UpdateUserLvl(user *StorageUser, lvl int) error {
+	tx, err := d.DSClient.NewTransaction(context.Background())
+	if err != nil {
+		return fmt.Errorf("client.NewTransaction: %v", err)
+	}
+	var userGet StorageUser
+	userKey := datastore.NameKey(d.EntityKind, user.ID, nil)
+	if err := tx.Get(userKey, &userGet); err != nil {
+		return fmt.Errorf("tx.Get: %v", err)
+	}
+	userGet.Level = lvl
+	if _, err := tx.Put(userKey, &userGet); err != nil {
+		return fmt.Errorf("tx.Put: %v", err)
+	}
+	if _, err := tx.Commit(); err != nil {
+		return fmt.Errorf("tx.Commit: %v", err)
+	}
+	return err
+}
+
 func NewDatastoreUserDAO(c *datastore.Client, EntityKind string) *DatastoreUserDAO {
 	return &DatastoreUserDAO{
 		DSClient:   c,
