@@ -33,10 +33,13 @@ func MustGetDatastoreClient() *datastore.Client {
 
 	return DSClient
 }
+
 func main() {
-	viberKey := os.Getenv("VIBER_KEY")
-	fmt.Println(viberKey)
-	v := viber.New(viberKey, "Народный опрос", "https://storage.googleapis.com/freeelections2020-img/bot-logo.jpg")
+	/*
+		viberKey := os.Getenv("VIBER_KEY")
+		fmt.Println(viberKey)
+		v := viber.New(viberKey, "Народный опрос", "https://storage.googleapis.com/freeelections2020-img/bot-logo.jpg")
+	*/
 	//all := []string{}
 	var ud *poll_bot.DatastoreUserDAO
 	if os.Getenv("DATASTORE_USERS_TABLE") != "" {
@@ -59,14 +62,22 @@ func main() {
 			fmt.Println(k, "Progress")
 			//os.Exit(1)
 		}
-		det, err := getDetails(i.ID, v)
-		if err != nil {
-			fmt.Println("Err getting details", err)
-			continue
+		/*
+			det, err := getDetails(i.ID, v)
+			if err != nil {
+				fmt.Println("Err getting details", err)
+				continue
+			}
+		*/
+		level := i.Level
+		newLvl := level
+		if level >= 6 {
+			newLvl = 5
+		} else if level == 5 || level == 4 {
+			newLvl = level - 1
 		}
-		err = ud.Update(&i, det.Mcc, det.Mnc)
-		fmt.Println("IDS", i.ID, det.Mcc, det.Mnc)
-		fmt.Printf("IDS with details %d, %d, %d , %+v\n", i.ID, det.Mcc, det.Mnc, det)
+		err = ud.UpdateUserLvl(&i, newLvl)
+		fmt.Println("IDS", i.ID, level, newLvl)
 		if err != nil {
 			fmt.Println("Error Updating database : ", err)
 		}
